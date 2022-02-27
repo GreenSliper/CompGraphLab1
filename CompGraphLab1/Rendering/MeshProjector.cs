@@ -8,7 +8,7 @@ namespace CompGraphLab1.Rendering
 {
 	class MeshProjector : IMeshProjector
 	{
-		public ObjPlanaredData Project(MeshTransform mesh)
+		public ObjPlanaredData Project(ObjData mesh, Camera camera)
 		{
 			//TODO
 			throw new NotImplementedException();

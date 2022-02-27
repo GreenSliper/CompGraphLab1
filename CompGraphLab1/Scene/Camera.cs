@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CompGraphLab1.Scene
 {
-	class Camera : Transform
+	public class Camera : Transform
 	{
 	}
 }

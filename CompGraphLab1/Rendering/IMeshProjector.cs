@@ -8,6 +8,6 @@ namespace CompGraphLab1.Rendering
 {
 	public interface IMeshProjector
 	{
-		ObjPlanaredData Project(MeshTransform mesh);
+		ObjPlanaredData Project(ObjData mesh, Camera camera);
 	}
 }

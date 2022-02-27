@@ -12,7 +12,7 @@ namespace CompGraphLab1.Rendering
 		public ObjData SelectVisibleData(MeshTransform obj, Vector3 eyePosition, Vector3 eyeNormal)
 		{
 			//TODO calc
-			return obj.objData;
+			return obj.DataToWorldSpace();
 		}
 	}
 }

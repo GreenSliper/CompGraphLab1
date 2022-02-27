@@ -7,7 +7,7 @@ namespace CompGraphLab1.Rendering
 {
 	public class Rasterizer : IRasterizer
 	{
-		public RasterTriangleData RasterTriangle(Triangle2D triangle)
+		public RasterTriangleData RasterTriangle(Triangle2D triangle, float pxInUnit)
 		{
 			throw new NotImplementedException();
 		}
