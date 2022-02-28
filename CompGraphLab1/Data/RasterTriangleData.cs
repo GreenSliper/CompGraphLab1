@@ -13,6 +13,6 @@ namespace CompGraphLab1.Data
 		/// <summary>
 		/// True, if the pixel is a part of triangle, otherwise - false
 		/// </summary>
-		public bool[] bitMask;
+		public bool[,] bitMask;
 	}
 }
