@@ -31,6 +31,8 @@ namespace CompGraphLab1
 			return MathF.Pow(SqrMagnitude(), 0.5f);
 		}
 
+		public Vector3 Normalized => this / Magnitude();
+
 		/// <summary>
 		/// Dot product of two vectors
 		/// </summary>
@@ -60,9 +62,14 @@ namespace CompGraphLab1
 			return Angle(other) * 180 / MathF.PI;
 		}
 
-		//Rotate the vector around zero point by given eulerAngles
+		/// <summary>
+		/// Rotate the vector around zero point by given eulerAngles (in degrees)
+		/// </summary>
+		/// <param name="eulerAngles">Euler angles in degrees</param>
+		/// <returns>Rotated vector</returns>
 		public Vector3 Rotate(Vector3 eulerAngles)
 		{
+			eulerAngles *= MathF.PI / 180f;
 			Matrix rx = new Matrix(new float[,] 
 				{
 				  {1, 0, 0 },
@@ -81,13 +88,24 @@ namespace CompGraphLab1
 				  {MathF.Sin(eulerAngles.z), MathF.Cos(eulerAngles.z), 0 },
 				  {0, 0, 1 }
 				});
-			var result = rx * ry * rz * new Matrix(new float[,] { { eulerAngles.x }, { eulerAngles.y }, { eulerAngles.z } });
+			var result = rx * ry * rz * new Matrix(new float[,] { { x }, { y }, { z } });
 			return new Vector3(result[0, 0], result[1, 0], result[2, 0]);
 		}
 
 		public Vector3 Multiply(Vector3 other)
 		{
 			return new Vector3(x * other.x, y * other.y, z * other.z);
+		}
+		public Vector3 Project(Vector3 other)
+		{
+			return MathF.Cos(Angle(other)) * Magnitude() / other.Magnitude() * other;
+		}
+
+		public Vector3 Project(Vector3 other, out bool isNegativeDirection)
+		{
+			var angle = Angle(other);
+			isNegativeDirection = angle > 90f;
+			return MathF.Cos(angle) * Magnitude() / other.Magnitude() * other;
 		}
 
 		public static Vector3 operator +(Vector3 first, Vector3 second)
@@ -99,5 +117,28 @@ namespace CompGraphLab1
 		{
 			return new Vector3(first.x - second.x, first.y - second.y, first.z - second.z);
 		}
+
+		public static Vector3 operator *(Vector3 vector, float magnitude)
+		{
+			return new Vector3(vector.x * magnitude, vector.y * magnitude, vector.z * magnitude);
+		}
+		public static Vector3 operator *(float magnitude, Vector3 vector)
+		{
+			return new Vector3(vector.x * magnitude, vector.y * magnitude, vector.z * magnitude);
+		}
+
+		public static Vector3 operator /(Vector3 vector, float magnitude)
+		{
+			return new Vector3(vector.x / magnitude, vector.y / magnitude, vector.z / magnitude);
+		}
+
+		public static Vector3 Forward => new Vector3(0, 0, 1);
+		public static Vector3 Backward => new Vector3(0, 0, -1);
+		public static Vector3 Right => new Vector3(1, 0, 0);
+		public static Vector3 Left => new Vector3(-1, 0, 0);
+		public static Vector3 Up => new Vector3(0, 1, 0);
+		public static Vector3 Down => new Vector3(0, -1, 0);
+		public static Vector3 Zero => new Vector3();
+		public static Vector3 One => new Vector3(1, 1, 1);
 	}
 }

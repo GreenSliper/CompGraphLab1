@@ -56,5 +56,29 @@ namespace CompGraphLab1.Scene
 					return parent.Rotation + localRotation;
 			}
 		}
+
+		public Vector3 Normal
+		{
+			get 
+			{
+				return Vector3.Forward.Rotate(Rotation);
+			}
+		}
+
+		public Vector3 Up
+		{
+			get 
+			{
+				return Vector3.Up.Rotate(Rotation);
+			}
+		}
+
+		public Vector3 Right
+		{
+			get
+			{
+				return Vector3.Right.Rotate(Rotation);
+			}
+		}
 	}
 }

@@ -17,14 +17,15 @@ namespace CompGraphLab1.Scene
 			var offs = Position;
 			var rot = Rotation;
 			//copy data
-			ObjData result = new ObjData() { tris = new List<Triangle3D>(objData.tris) };
+			ObjData result = new ObjData();
 
-			for(int i = 0; i < result.tris.Count; i++)
+			for(int i = 0; i < objData.tris.Count; i++)
 			{
+				result.tris.Add(new Triangle3D(objData.tris[i].verts[0], objData.tris[i].verts[1], objData.tris[i].verts[2]));
 				for (int j = 0; j < 3; j++)
 				{
-					result.tris[i].verts[j] += offs;
 					result.tris[i].verts[j] = result.tris[i].verts[j].Rotate(Rotation);
+					result.tris[i].verts[j] += offs;
 				}
 			}
 			return result;
