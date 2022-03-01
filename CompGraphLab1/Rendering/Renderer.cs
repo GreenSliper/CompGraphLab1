@@ -3,31 +3,34 @@ using CompGraphLab1.Scene;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CompGraphLab1.Rendering
 {
-	public class ZBufferBuilder
+	public class Renderer
 	{
+		ITriangleSelector triangleSelector = new TriangleSelector();
 		IMeshProjector meshProjector = new MeshProjector();
 		IRasterizer rasterizer = new AltRasterizer();
-		public float[,] BuildBuffer(Vector2Int screenSize, IEnumerable<MeshTransform> sceneMeshes, Camera camera)
+		public float[,] RenderZBufferFillPoly(Vector2Int screenSize, IEnumerable<MeshTransform> sceneMeshes, Camera camera,
+			Func<MeshTransform, Triangle3D, Color> renderFunction, Color[,] render)
 		{
-			var planared = new ConcurrentBag<ObjPlanaredData>();
+			var planared = new ConcurrentBag<(ObjPlanaredData planaredData, MeshTransform mesh)>();
 			//project meshes to [(0,0); (1,1)] renderPlane space
 			Parallel.ForEach(sceneMeshes, (mesh) =>
 			{
-				planared.Add(meshProjector.Project(mesh.DataToWorldSpace(), camera));
+				planared.Add((meshProjector.Project(triangleSelector.SelectVisibleData(mesh, camera.Position, camera.Normal), camera), mesh));
 			});
 			//raster planared meshes to bitmasks
-			var rasteredMeshes = new ConcurrentBag<ConcurrentBag<RasterTriangleData>>();
+			var rasteredMeshes = new ConcurrentBag<(ConcurrentBag<(RasterTriangleData rasterData, Triangle3D tri)>, MeshTransform)>();
 			Parallel.ForEach(planared, (planar) =>
 			{
-				var rasteredPlanarTris = new ConcurrentBag<RasterTriangleData>();
-				Parallel.ForEach(planar.tris, (tri) =>
-					rasteredPlanarTris.Add(rasterizer.RasterTriangle(tri, screenSize.x, screenSize.y)));
-				rasteredMeshes.Add(rasteredPlanarTris);
+				var rasteredPlanarTris = new ConcurrentBag<(RasterTriangleData, Triangle3D)>();
+				Parallel.ForEach(planar.planaredData.tris, (tri) =>
+					rasteredPlanarTris.Add((rasterizer.RasterTriangle(tri, screenSize.x, screenSize.y), tri.original)));
+				rasteredMeshes.Add((rasteredPlanarTris, planar.mesh));
 			});
 
 			float[,] zbuffer = new float[screenSize.x, screenSize.y];
@@ -36,13 +39,13 @@ namespace CompGraphLab1.Rendering
 					zbuffer[x,y] = float.MaxValue;
 
 			foreach (var rasterMesh in rasteredMeshes)
-				foreach (var tri in rasterMesh)
-					ProcessTriangle(tri, screenSize, zbuffer);
-			
+				foreach (var triData in rasterMesh.Item1)
+					ProcessTriangle(triData.rasterData, screenSize, zbuffer, renderFunction, rasterMesh.Item2, triData.tri, render);
 			return zbuffer;
 		}
 
-		void ProcessTriangle(RasterTriangleData rastTri, Vector2Int screenSize, float[,] zbuffer)
+		void ProcessTriangle(RasterTriangleData rastTri, Vector2Int screenSize, float[,] zbuffer,
+			Func<MeshTransform, Triangle3D, Color> renderFunction, MeshTransform mesh, Triangle3D tri, Color[,] render)
 		{
 			for (int x = 0; x < rastTri.bitMask.GetLength(0); x++)
 				for (int y = 0; y < rastTri.bitMask.GetLength(1); y++)
@@ -51,9 +54,14 @@ namespace CompGraphLab1.Rendering
 					{
 						int zx = x + rastTri.x;
 						int zy = y + rastTri.y;
+						if (zx >= render.GetLength(0) || zy >= render.GetLength(1) || zx < 0 || zy < 0)
+							continue;
 						var z = CalcZ(rastTri, (float)(zx) / screenSize.x, (float)(zy) / screenSize.y);
 						if (z < zbuffer[zx, zy])
+						{
 							zbuffer[zx, zy] = z;
+							render[zx, zy] = renderFunction(mesh, tri);
+						}
 					}
 				}
 		}

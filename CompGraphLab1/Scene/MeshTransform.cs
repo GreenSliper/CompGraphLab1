@@ -1,6 +1,7 @@
 ﻿using CompGraphLab1.Data;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 
 namespace CompGraphLab1.Scene
@@ -10,6 +11,7 @@ namespace CompGraphLab1.Scene
 	/// </summary>
 	public class MeshTransform : Transform
 	{
+		public Vector3 baseColor = new Vector3(Color.White)/255;
 		public ObjData objData;
 
 		public ObjData DataToWorldSpace()

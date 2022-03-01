@@ -12,7 +12,13 @@ namespace CompGraphLab1.Rendering
 		public ObjData SelectVisibleData(MeshTransform obj, Vector3 eyePosition, Vector3 eyeNormal)
 		{
 			//TODO calc
-			return obj.DataToWorldSpace();
+			var data = obj.DataToWorldSpace();
+			for (int i = 0; i < data.tris.Count; i++)
+			{
+				if (data.tris[i].Normal.Angle(eyeNormal) < MathF.PI/2)
+					data.tris.RemoveAt(i--);
+			}
+			return data;
 		}
 	}
 }

@@ -17,9 +17,9 @@ namespace CompGraphLab1
 	{
 		Camera cam;
 		//IMeshProjector meshProjector = new MeshProjector();
-		ZBufferBuilder zbb = new ZBufferBuilder();
+		Renderer zbb = new Renderer();
 		IObjLoader loader = new ObjLoader();
-		MeshTransform mesh;
+		MeshTransform mesh, mesh1;
 		public Form1()
 		{
 			InitializeComponent();
@@ -28,50 +28,53 @@ namespace CompGraphLab1
 			{
 				localPosition = Vector3.Forward * 5,
 				localScale = Vector3.One,
-				localRotation = Vector3.Up * 45f,
-				objData = loader.LoadFile(@"C:\Users\Igor\Desktop\cube.obj")
+				localRotation = Vector3.Up*30,
+				objData = loader.LoadFile(@"C:\Users\Igor\Desktop\amogus.obj"),
+				baseColor = new Vector3(1, 0, 0)
+			};
+			mesh1 = new MeshTransform()
+			{
+				localPosition = Vector3.Forward * 5,
+				localScale = Vector3.One,
+				localRotation = Vector3.Up * 30,
+				objData = loader.LoadFile(@"C:\Users\Igor\Desktop\amogus_visor.obj"),
+				baseColor = new Vector3(0, 0, 1)
 			};
 		}
 
 		private void Ticker_Tick(object sender, EventArgs e)
 		{
-			mesh.localRotation += Vector3.Up*15f;
-			Invalidate();
+			//mesh.localRotation += Vector3.Up*15f;
+			//Invalidate();
+		}
+		
+		private Color Lerp(Color c1, Color c2, float t)
+		{
+			return Color.FromArgb(c1.R + (int)MathF.Round((c2.R - c1.R) * t), 
+				c1.G + (int)MathF.Round((c2.G - c1.G) * t), 
+				c1.B + (int)MathF.Round((c2.B - c1.B) * t));
 		}
 
+		DirectionalLight light = new DirectionalLight() { localRotation = new Vector3(-60, 180, 0) };
+		Bitmap img = new Bitmap(600, 600);
 		private void Form1_Paint(object sender, PaintEventArgs e)
 		{
-			Bitmap img = new Bitmap(600, 600);
-			var zb = zbb.BuildBuffer(new Vector2Int(600, 600), new List<MeshTransform>() { mesh }, cam);
+			var render = new Color[600, 600];
+			var zb = zbb.RenderZBufferFillPoly(new Vector2Int(600, 600), new List<MeshTransform>() { mesh, mesh1 }, cam, 
+				(msh, tri)=>SimpleLightShader.GetTriangleColor(msh, tri, light), render);
 			for (int x = 0; x < zb.GetLength(0); x++)
 				for (int y = 0; y < zb.GetLength(1); y++)
 				{
-					zb[x, y] = MathF.Min(255, 512/zb[x, y]);
-					img.SetPixel(x, y, Color.FromArgb((int)zb[x, y], (int)zb[x, y], (int)zb[x, y]));
-				}
-
-			/*Rasterizer rst = new Rasterizer();
-			var tri = rst.RasterTriangle(new Data.Triangle2D(new Vector2(0, 0), new Vector2(1, 1), new Vector2(0.6f, 0.4f), 0, 0, 0), 600, 600);
-			var zb = new float[600, 600];
-			for (int x = 0; x < zb.GetLength(0); x++)
-				for (int y = 0; y < zb.GetLength(1); y++)
-				{
-					if (tri.bitMask[x, y])
-						zb[x, y] = 255;
-					img.SetPixel(x, y, Color.FromArgb((int)zb[x, y], (int)zb[x, y], (int)zb[x, y]));
-				}*/
-			/*
-			var rstrzr = new AltRasterizer();
-			foreach (var tri in planar.tris)
-			{
-				var raster = rstrzr.RasterTriangle(tri, 600, 600);
-				for (int x = 0; x < raster.bitMask.GetLength(0); x++)
-					for (int y = 0; y < raster.bitMask.GetLength(1); y++)
+					if (zb[x, y] != float.MaxValue)
 					{
-						if (raster.bitMask[x, y])
-							img.SetPixel(x + raster.x, y + raster.y, Color.Black);
+						float t = MathF.Pow(zb[x, y], 4) / 1000;
+						zb[x, y] = MathF.Min(255, 512 / zb[x, y]);
+						int z = (int)MathF.Round(zb[x, y]);
+						img.SetPixel(x, y, Lerp(render[x, y], Color.FromArgb(z/2, z/4, z), t));
 					}
-			}*/
+					else
+						img.SetPixel(x, y, Color.Black);
+				}
 			e.Graphics.DrawImage(img, 0, 0);
 			/*
 			var planar = new MeshProjector().Project(mesh.DataToWorldSpace(), cam);

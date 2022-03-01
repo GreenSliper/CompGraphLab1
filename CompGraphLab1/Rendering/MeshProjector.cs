@@ -30,7 +30,7 @@ namespace CompGraphLab1.Rendering
 					var v3 = ConvertRenderPlaneCoordToViewRect(
 								ProjectOnRenderPlane3D(tri.verts[2], camPos, camNorm, camera.renderPlaneDistance, out var v3Z),
 								canvasLeftBottomCorner, canvasUp, canvasRight);
-					resultTris.Add(new Triangle2D(v1, v2, v3, v1Z, v2Z, v3Z));
+					resultTris.Add(new Triangle2D(v1, v2, v3, v1Z, v2Z, v3Z, tri));
 				});
 			return new ObjPlanaredData() { tris = new List<Triangle2D>(resultTris)};
 		}

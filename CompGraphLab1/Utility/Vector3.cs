@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 
 namespace CompGraphLab1
@@ -13,6 +14,18 @@ namespace CompGraphLab1
 			this.x = x;
 			this.y = y;
 			this.z = z;
+		}
+
+		public Vector3(Color color)
+		{
+			x = color.R;
+			y = color.G;
+			z = color.B;
+		}
+
+		public Color ToColor()
+		{
+			return Color.FromArgb((int)MathF.Round(x), (int)MathF.Round(y), (int)MathF.Round(z));
 		}
 
 		/// <summary>

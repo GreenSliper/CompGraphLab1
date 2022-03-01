@@ -13,6 +13,14 @@ namespace CompGraphLab1.Data
 
 		public Vector3[] verts;
 		//TODO
-		public Vector3 Normal => throw new NotImplementedException();
+		public Vector3 Normal
+		{
+			get 
+			{
+				Vector3 A = verts[1] - verts[0];
+				Vector3 B = verts[2] - verts[1];
+				return new Vector3(A.y * B.z - A.z * B.y, A.z * B.x - A.x * B.z, A.x * B.y - A.y * B.x);
+			}
+		}
 	}
 }
