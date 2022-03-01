@@ -14,35 +14,29 @@ namespace CompGraphLab1.Rendering
 			Vector2Int vertex2 = ConvertToRaster(triangle.verts[1], pxWidth, pxHeight);
 			Vector2Int vertex3 = ConvertToRaster(triangle.verts[2], pxWidth, pxHeight);
 
-			// coordinates of the lower left corner of the rectangle
-			Vector2Int lowerLeftCorner = new Vector2Int(
+			// coordinates of the upper left corner of the rectangle
+			Vector2Int upperLeftCorner = new Vector2Int(
 				Math.Min(vertex1.x, Math.Min(vertex2.x, vertex3.x)),
 				Math.Max(vertex1.y, Math.Max(vertex2.y, vertex3.y)));
 
-			// coordinates of the upper right corner of the rectangle
-			Vector2Int upperRightCorner = new Vector2Int(
+			// coordinates of the lower right corner of the rectangle
+			Vector2Int lowerRightCorner = new Vector2Int(
 				Math.Max(vertex1.x, Math.Max(vertex2.x, vertex3.x)),
 				Math.Min(vertex1.y, Math.Min(vertex2.y, vertex3.y)));
 
-			// coordinates of the upper left corner of the rectangle
-			Vector2Int upperLeftCorner = new Vector2Int(lowerLeftCorner.x, upperRightCorner.y);
+			// coordinates of the lower left corner of the rectangle
+			Vector2Int lowerLeftCorner = new Vector2Int(upperLeftCorner.x, lowerRightCorner.y);
 
 			// triangle bitmask
 			bool[,] bitMask = new bool[
-				lowerLeftCorner.y - upperRightCorner.y,
-				upperRightCorner.x - lowerLeftCorner.x];
+				upperLeftCorner.y - lowerRightCorner.y + 1,
+				lowerRightCorner.x - upperLeftCorner.x + 1];
 
-			// starts and ends of the lines to fill the triangle
-			int[,] ranges = new int[bitMask.GetLength(0), 2];
-
-			// flags indicating whether the given line was processed before
-			bool[] flags = new bool[bitMask.GetLength(0)];
-
-			BresenhamLine(vertex1, vertex2, upperLeftCorner, bitMask, ranges, flags);
-			BresenhamLine(vertex2, vertex3, upperLeftCorner, bitMask, ranges, flags);
-			BresenhamLine(vertex3, vertex1, upperLeftCorner, bitMask, ranges, flags);
-
-			FillTriangleBitMask(bitMask, ranges);
+			Rasterize(
+				new Vector2Int(vertex1.x - lowerLeftCorner.x, vertex1.y - lowerLeftCorner.y),
+				new Vector2Int(vertex2.x - lowerLeftCorner.x, vertex2.y - lowerLeftCorner.y),
+				new Vector2Int(vertex3.x - lowerLeftCorner.x, vertex3.y - lowerLeftCorner.y),
+				bitMask);
 
 			return new RasterTriangleData
 			{
@@ -50,7 +44,6 @@ namespace CompGraphLab1.Rendering
 				y = lowerLeftCorner.y,
 				bitMask = bitMask
 			};
-			// throw new NotImplementedException();
 		}
 
 		private Vector2Int ConvertToRaster(Vector2 point, float pxWidth, float pxHeight)
@@ -60,69 +53,105 @@ namespace CompGraphLab1.Rendering
 				(int)MathF.Round((1 - point.y) * pxHeight));
         }
 
-		// in this case, the Bresenham algorithm is used to fill
-        // in the bitmask of the lines of the triangle
-		private void BresenhamLine(Vector2Int v1, Vector2Int v2, Vector2Int bitMaskStart, bool[,] bitMask, int[,] ranges, bool[] flags)
-        {
-			int deltaX = Math.Abs(v2.x - v1.x);
-			int deltaY = Math.Abs(v2.y - v1.y);
-			int signX = v1.x < v2.x ? 1 : -1;
-			int signY = v1.y < v2.y ? 1 : -1;
-			int error = deltaX - deltaY;
-			int posX = v2.x - bitMaskStart.x;
-			int posY = v2.y - bitMaskStart.y;
+		static void Swap<T>(ref T lhs, ref T rhs)
+		{
+			T temp;
+			temp = lhs;
+			lhs = rhs;
+			rhs = temp;
+		}
 
-			bitMask[posY, posX] = true;
-			if (flags[posY])
+		private int int_to_fixed(int value)
+		{
+			return (value << 16);
+		}
+
+		private int fixed_to_int(int value)
+		{
+			return (value < 0) ? (value >> 16 - 1) : (value >> 16);
+		}
+
+		private void Rasterize(Vector2Int v1, Vector2Int v2, Vector2Int v3, bool[,] bitMask)
+		{
+			if (v2.y < v1.y)
 			{
-				ranges[posY, 0] = Math.Min(ranges[posY, 0], posX);
+				Swap(ref v1, ref v2);
+			}
+			if (v3.y < v1.y)
+			{
+				Swap(ref v1, ref v3);
+			}
+			if (v2.y > v3.y)
+			{
+				Swap(ref v2, ref v3);
+			}
+
+			int dx13 = 0, dx12 = 0, dx23 = 0;
+
+			if (v3.y != v1.y)
+			{
+				dx13 = int_to_fixed(v3.x - v1.x);
+				dx13 /= v3.y - v1.y;
 			}
 			else
-            {
-				ranges[posY, 0] = posX;
-				flags[posY] = true;
-			}
-			ranges[posY, 1] = Math.Max(ranges[posY, 1], posX);
-
-			while (v1.x != v2.x || v1.y != v2.y)
-            {
-				int tmp_error = error * 2;
-				posX = v1.x - bitMaskStart.x;
-				posY = v1.y - bitMaskStart.y;
-
-				bitMask[posY, posX] = true;
-				if (flags[posY])
-				{
-					ranges[posY, 0] = Math.Min(ranges[posY, 0], posX);
-				}
-				else
-				{
-					ranges[posY, 0] = posX;
-					flags[posY] = true;
-				}
-				ranges[posY, 1] = Math.Max(ranges[posY, 1], posX);
-
-				if (tmp_error > -deltaY)
-                {
-					error -= deltaY;
-					v1.x += signX;
-                }
-				if (tmp_error < deltaX)
-                {
-					error += deltaX;
-					v2.y += signY;
-                }
-            }
-        }
-
-		private void FillTriangleBitMask(bool[,] bitMask, int[,] ranges)
-		{
-			for (int i = 0; i < ranges.GetLength(0); ++i)
 			{
-				for (int j = ranges[i, 0]; j < ranges[i, 1]; ++j)
+				dx13 = 0;
+			}
+
+			if (v2.y != v1.y)
+			{
+				dx12 = int_to_fixed(v2.x - v1.x);
+				dx12 /= (v2.y - v1.y);
+			}
+			else
+			{
+				dx12 = 0;
+			}
+
+			if (v3.y != v2.y)
+			{
+				dx23 = int_to_fixed(v3.x - v3.x);
+				dx23 /= (v3.y - v2.y);
+			}
+			else
+			{
+				dx23 = 0;
+			}
+
+			int wx1 = int_to_fixed(v1.x);
+			int wx2 = wx1; 
+			int _dx13 = dx13;
+
+			if (dx13 > dx12)
+			{
+				Swap(ref dx13, ref dx12);
+			}
+			for (int i = v1.y; i < v2.y; ++i)
+			{
+				for (int j = fixed_to_int(wx1); j <= fixed_to_int(wx2); ++j)
 				{
 					bitMask[i, j] = true;
 				}
+				wx1 += dx13;
+				wx2 += dx12;
+			}
+			if (v1.y == v2.y)
+			{
+				wx1 = int_to_fixed(v1.x);
+				wx2 = int_to_fixed(v2.x);
+			}
+			if (_dx13 < dx23)
+			{
+				Swap(ref _dx13, ref dx23);
+			}
+			for (int i = v2.y; i <= v3.y; i++)
+			{
+				for (int j = fixed_to_int(wx1); j <= fixed_to_int(wx2); j++)
+				{
+					bitMask[i, j] = true;
+				}
+				wx1 += _dx13;
+				wx2 += dx23;
 			}
 		}
 	}
