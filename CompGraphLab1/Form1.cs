@@ -1,4 +1,5 @@
-﻿using CompGraphLab1.Rendering;
+﻿using CompGraphLab1.Load;
+using CompGraphLab1.Rendering;
 using CompGraphLab1.Scene;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace CompGraphLab1
 	{
 		Camera cam;
 		IMeshProjector meshProjector = new MeshProjector();
+		IObjLoader loader = new ObjLoader();
 		MeshTransform mesh;
 		public Form1()
 		{
@@ -23,21 +25,15 @@ namespace CompGraphLab1
 			cam = new Camera() { localPosition = Vector3.Zero, horizontalAngle = 60, verticalAngle = 60, renderPlaneDistance = 1f};
 			mesh = new MeshTransform()
 			{
-				localPosition = Vector3.Forward * 3,
+				localPosition = Vector3.Forward * 5,
 				localScale = Vector3.One,
-				objData = new Data.ObjData()
-				{
-					tris = new List<Data.Triangle3D>()
-					{
-						new Data.Triangle3D(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(1, 1, 0))
-					}
-				}
+				objData = loader.LoadFile(@"C:\Users\Igor\Desktop\cube.obj")
 			};
 		}
 
 		private void Ticker_Tick(object sender, EventArgs e)
 		{
-			mesh.localRotation += Vector3.Up*10;
+			mesh.localRotation += Vector3.Up*5;
 			Invalidate();
 		}
 
