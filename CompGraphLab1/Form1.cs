@@ -26,7 +26,7 @@ namespace CompGraphLab1
 			cam = new Camera() { localPosition = Vector3.Zero, horizontalAngle = 60, verticalAngle = 60, renderPlaneDistance = 1f};
 			mesh = new MeshTransform()
 			{
-				localPosition = Vector3.Forward * 5,
+				localPosition = Vector3.Forward * 15,
 				localScale = Vector3.One,
 				objData = loader.LoadFile(@"C:\Users\Igor\Desktop\cube.obj")
 			};
@@ -34,18 +34,32 @@ namespace CompGraphLab1
 
 		private void Ticker_Tick(object sender, EventArgs e)
 		{
-			mesh.localRotation += Vector3.Up*5;
+			mesh.localRotation += Vector3.Up*15;
 			Invalidate();
 		}
 
 		private void Form1_Paint(object sender, PaintEventArgs e)
 		{
-			var zb = zbb.BuildBuffer(new Vector2Int(600, 600), new List<MeshTransform>() { mesh }, cam);
 			Bitmap img = new Bitmap(600, 600);
+			/*var zb = zbb.BuildBuffer(new Vector2Int(600, 600), new List<MeshTransform>() { mesh }, cam);
 			for (int x = 0; x < zb.GetLength(0); x++)
 				for (int y = 0; y < zb.GetLength(1); y++)
+				{
+					zb[x, y] = MathF.Min(255, 1024/zb[x, y]);
 					img.SetPixel(x, y, Color.FromArgb((int)zb[x, y], (int)zb[x, y], (int)zb[x, y]));
-			e.Graphics.DrawImage(null, 0, 0);
+				}
+			*/
+			Rasterizer rst = new Rasterizer();
+			var tri = rst.RasterTriangle(new Data.Triangle2D(new Vector2(0, 0), new Vector2(1, 1), new Vector2(0.6f, 0.4f), 0, 0, 0), 600, 600);
+			var zb = new float[600, 600];
+			for (int x = 0; x < zb.GetLength(0); x++)
+				for (int y = 0; y < zb.GetLength(1); y++)
+				{
+					if (tri.bitMask[x, y])
+						zb[x, y] = 255;
+					img.SetPixel(x, y, Color.FromArgb((int)zb[x, y], (int)zb[x, y], (int)zb[x, y]));
+				}
+			e.Graphics.DrawImage(img, 0, 0);
 			/*var planar = meshProjector.Project(mesh.DataToWorldSpace(), cam);
 			foreach (var tri in planar.tris)
 			{

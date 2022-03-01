@@ -36,7 +36,7 @@ namespace CompGraphLab1
 			// Ticker
 			// 
 			this.Ticker.Enabled = true;
-			this.Ticker.Interval = 33;
+			this.Ticker.Interval = 2000;
 			this.Ticker.Tick += new System.EventHandler(this.Ticker_Tick);
 			// 
 			// Form1

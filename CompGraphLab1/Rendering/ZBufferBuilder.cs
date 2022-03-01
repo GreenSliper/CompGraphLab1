@@ -31,7 +31,10 @@ namespace CompGraphLab1.Rendering
 			});
 
 			float[,] zbuffer = new float[screenSize.x, screenSize.y];
-			
+			for (int x = 0; x < screenSize.x; x++)
+				for (int y = 0; y < screenSize.x; y++)
+					zbuffer[x,y] = float.MaxValue;
+
 			foreach (var rasterMesh in rasteredMeshes)
 				foreach (var tri in rasterMesh)
 					ProcessTriangle(tri, screenSize, zbuffer);
@@ -46,9 +49,11 @@ namespace CompGraphLab1.Rendering
 				{
 					if (rastTri.bitMask[x, y])
 					{
-						var z = CalcZ(rastTri, (float)(x + rastTri.x) / screenSize.x, (float)(y + rastTri.y) / screenSize.y);
-						if (z < zbuffer[x, y])
-							zbuffer[x, y] = z;
+						int zx = x + rastTri.x;
+						int zy = y + rastTri.y;
+						//var z = CalcZ(rastTri, (float)(zx) / screenSize.x, (float)(zy) / screenSize.y);
+						//if (z < zbuffer[zx, zy])
+							zbuffer[zx, zy] = 1;
 					}
 				}
 		}
