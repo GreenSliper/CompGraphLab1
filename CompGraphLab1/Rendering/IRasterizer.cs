@@ -7,6 +7,6 @@ namespace CompGraphLab1.Rendering
 {
 	public interface IRasterizer
 	{
-		RasterTriangleData RasterTriangle(Triangle2D triangle, float pxInUnit);
+		RasterTriangleData RasterTriangle(Triangle2D triangle, float pxWidth, float pxHeight);
 	}
 }
