@@ -48,7 +48,8 @@ namespace CompGraphLab1.Rendering
 			{
 				x = lowerLeftCorner.x,
 				y = lowerLeftCorner.y,
-				bitMask = bitMask
+				bitMask = bitMask,
+				source = triangle
 			};
 			// throw new NotImplementedException();
 		}

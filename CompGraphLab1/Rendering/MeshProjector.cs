@@ -22,24 +22,26 @@ namespace CompGraphLab1.Rendering
 				(tri) =>
 				{
 					var v1 = ConvertRenderPlaneCoordToViewRect(
-								ProjectOnRenderPlane3D(tri.verts[0], camPos, camNorm, camera.renderPlaneDistance),
+								ProjectOnRenderPlane3D(tri.verts[0], camPos, camNorm, camera.renderPlaneDistance, out var v1Z),
 								canvasLeftBottomCorner, canvasUp, canvasRight);
 					var v2 = ConvertRenderPlaneCoordToViewRect(
-								ProjectOnRenderPlane3D(tri.verts[1], camPos, camNorm, camera.renderPlaneDistance),
+								ProjectOnRenderPlane3D(tri.verts[1], camPos, camNorm, camera.renderPlaneDistance, out var v2Z),
 								canvasLeftBottomCorner, canvasUp, canvasRight);
 					var v3 = ConvertRenderPlaneCoordToViewRect(
-								ProjectOnRenderPlane3D(tri.verts[2], camPos, camNorm, camera.renderPlaneDistance),
+								ProjectOnRenderPlane3D(tri.verts[2], camPos, camNorm, camera.renderPlaneDistance, out var v3Z),
 								canvasLeftBottomCorner, canvasUp, canvasRight);
-					resultTris.Add(new Triangle2D(v1, v2, v3, tri));
+					resultTris.Add(new Triangle2D(v1, v2, v3, v1Z, v2Z, v3Z));
 				});
 			return new ObjPlanaredData() { tris = new List<Triangle2D>(resultTris)};
 		}
 
-		public static Vector3 ProjectOnRenderPlane3D(Vector3 sourcePoint, Vector3 cameraPos, Vector3 cameraNormal, float renderPlaneDist)
+		public static Vector3 ProjectOnRenderPlane3D(Vector3 sourcePoint, Vector3 cameraPos, Vector3 cameraNormal, float renderPlaneDist, 
+			out float distance)
 		{
 			var delta = sourcePoint - cameraPos;
 			var normal = cameraNormal;
-			return cameraPos + delta.Normalized * renderPlaneDist / MathF.Cos(delta.Angle(normal));
+			distance = delta.Magnitude();
+			return cameraPos + delta / distance * renderPlaneDist / MathF.Cos(delta.Angle(normal));
 		}
 
 		public static Vector2 ConvertRenderPlaneCoordToViewRect(Vector3 pointOnRenderPlane, Vector3 canvasLeftBottomCorner, 
