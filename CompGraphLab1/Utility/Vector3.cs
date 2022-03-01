@@ -104,7 +104,7 @@ namespace CompGraphLab1
 		public Vector3 Project(Vector3 other, out bool isNegativeDirection)
 		{
 			var angle = Angle(other);
-			isNegativeDirection = angle > 90f;
+			isNegativeDirection = angle > 0.5f * MathF.PI;
 			return MathF.Cos(angle) * Magnitude() / other.Magnitude() * other;
 		}
 
