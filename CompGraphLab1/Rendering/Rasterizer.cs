@@ -7,12 +7,12 @@ namespace CompGraphLab1.Rendering
 {
 	public class Rasterizer : IRasterizer
 	{
-		public RasterTriangleData RasterTriangle(Triangle2D triangle, float pxInUnit)
+		public RasterTriangleData RasterTriangle(Triangle2D triangle, float pxWidth, float pxHeight)
 		{
 			// coordinates in raster space
-			Vector2Int vertex1 = ConvertToRaster(triangle.verts[0], pxInUnit);
-			Vector2Int vertex2 = ConvertToRaster(triangle.verts[1], pxInUnit);
-			Vector2Int vertex3 = ConvertToRaster(triangle.verts[2], pxInUnit);
+			Vector2Int vertex1 = ConvertToRaster(triangle.verts[0], pxWidth, pxHeight);
+			Vector2Int vertex2 = ConvertToRaster(triangle.verts[1], pxWidth, pxHeight);
+			Vector2Int vertex3 = ConvertToRaster(triangle.verts[2], pxWidth, pxHeight);
 
 			// coordinates of the lower left corner of the rectangle
 			Vector2Int lowerLeftCorner = new Vector2Int(
@@ -53,11 +53,11 @@ namespace CompGraphLab1.Rendering
 			// throw new NotImplementedException();
 		}
 
-		private Vector2Int ConvertToRaster(Vector2 point, float pxInUnit)
+		private Vector2Int ConvertToRaster(Vector2 point, float pxWidth, float pxHeight)
         {
 			return new Vector2Int(
-				(int)MathF.Round(point.x * pxInUnit),
-				(int)MathF.Round((1 - point.y) * pxInUnit));
+				(int)MathF.Round(point.x * pxWidth),
+				(int)MathF.Round((1 - point.y) * pxHeight));
         }
 
 		// in this case, the Bresenham algorithm is used to fill
