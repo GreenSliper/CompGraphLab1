@@ -42,9 +42,9 @@ namespace CompGraphLab1.Rendering
 		void ProcessTriangle(RasterTriangleData rastTri, Vector2Int screenSize, float[,] zbuffer)
 		{
 			for (int x = 0; x < rastTri.bitMask.GetLength(0); x++)
-				for (int y = 0; y < rastTri.bitMask.GetLength(0); y++)
+				for (int y = 0; y < rastTri.bitMask.GetLength(1); y++)
 				{
-					if (rastTri.bitMask[x+rastTri.x, y+rastTri.y])
+					if (rastTri.bitMask[x, y])
 					{
 						var z = CalcZ(rastTri, (float)(x + rastTri.x) / screenSize.x, (float)(y + rastTri.y) / screenSize.y);
 						if (z < zbuffer[x, y])
