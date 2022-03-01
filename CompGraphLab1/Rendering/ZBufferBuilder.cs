@@ -11,7 +11,7 @@ namespace CompGraphLab1.Rendering
 	public class ZBufferBuilder
 	{
 		IMeshProjector meshProjector = new MeshProjector();
-		IRasterizer rasterizer = new Rasterizer();
+		IRasterizer rasterizer = new AltRasterizer();
 		public float[,] BuildBuffer(Vector2Int screenSize, IEnumerable<MeshTransform> sceneMeshes, Camera camera)
 		{
 			var planared = new ConcurrentBag<ObjPlanaredData>();
@@ -51,19 +51,27 @@ namespace CompGraphLab1.Rendering
 					{
 						int zx = x + rastTri.x;
 						int zy = y + rastTri.y;
-						//var z = CalcZ(rastTri, (float)(zx) / screenSize.x, (float)(zy) / screenSize.y);
-						//if (z < zbuffer[zx, zy])
-							zbuffer[zx, zy] = 1;
+						var z = CalcZ(rastTri, (float)(zx) / screenSize.x, (float)(zy) / screenSize.y);
+						if (z < zbuffer[zx, zy])
+							zbuffer[zx, zy] = z;
 					}
 				}
 		}
 
+		float Area(float ptx, float pty, in Vector2 p2, in Vector2 p3)
+		{
+			return MathF.Abs((ptx * (p2.y - p3.y) + p2.x * (p3.y - pty) + p3.x * (pty - p2.y)) / 2f);
+		}
+
 		float CalcZ(RasterTriangleData rastTri, float x, float y)
 		{
-			float d0 = MathF.Sqrt(MathF.Pow(rastTri.source.verts[0].x - x, 2) + MathF.Pow(rastTri.source.verts[0].y - y, 2));
-			float d1 = MathF.Sqrt(MathF.Pow(rastTri.source.verts[1].x - x, 2) + MathF.Pow(rastTri.source.verts[1].y - y, 2));
-			float d2 = MathF.Sqrt(MathF.Pow(rastTri.source.verts[2].x - x, 2) + MathF.Pow(rastTri.source.verts[2].y - y, 2));
-			return (rastTri.source.vertDists[0] * d0 + rastTri.source.vertDists[1] * d1 + rastTri.source.vertDists[2] * d2) / (d0 + d1 + d2);
+			float z1 = rastTri.source.vertDists[0];
+			float z2 = rastTri.source.vertDists[1];
+			float z3 = rastTri.source.vertDists[2];
+			float a1 = Area(x, y, rastTri.source.verts[1], rastTri.source.verts[2]);
+			float a2 = Area(x, y, rastTri.source.verts[0], rastTri.source.verts[2]);
+			float a3 = Area(x, y, rastTri.source.verts[0], rastTri.source.verts[1]);
+			return (z1 * a1 + z2 * a2 + z3 * a3) / (a1+a2+a3);
 		}
 	}
 }

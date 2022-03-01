@@ -14,5 +14,20 @@ namespace CompGraphLab1
 			this.x = x;
 			this.y = y;
 		}
+
+		public Vector2 Multiply(Vector2 other)
+		{
+			return new Vector2(x * other.x, y * other.y);
+		}
+
+		public static Vector2 operator +(Vector2 first, Vector2 second)
+		{
+			return new Vector2(first.x + second.x, first.y + second.y);
+		}
+
+		public static Vector2 operator -(Vector2 first, Vector2 second)
+		{
+			return new Vector2(first.x - second.x, first.y - second.y);
+		}
 	}
 }
