@@ -50,8 +50,8 @@ namespace CompGraphLab1.Rendering
 		private Vector2Int ConvertToRaster(Vector2 point, float pxWidth, float pxHeight)
         {
 			return new Vector2Int(
-				(int)MathF.Round(point.x * pxWidth),
-				(int)MathF.Round((1 - point.y) * pxHeight));
+				(int)MathF.Round(point.x * (pxWidth - 1)),
+				(int)MathF.Round((1 - point.y) * (pxHeight - 1)));
         }
 
 		static void Swap<T>(ref T lhs, ref T rhs)
@@ -62,95 +62,45 @@ namespace CompGraphLab1.Rendering
 			rhs = temp;
 		}
 
-		private int int_to_fixed(int value)
-		{
-			return (value << 16);
-		}
-
-		private int fixed_to_int(int value)
-		{
-			return (value < 0) ? (value >> 16 - 1) : (value >> 16);
-		}
-
 		private void Rasterize(Vector2Int v1, Vector2Int v2, Vector2Int v3, bool[,] bitMask)
 		{
 			if (v2.y < v1.y)
-			{
 				Swap(ref v1, ref v2);
-			}
 			if (v3.y < v1.y)
-			{
 				Swap(ref v1, ref v3);
-			}
 			if (v2.y > v3.y)
-			{
 				Swap(ref v2, ref v3);
-			}
 
-			int dx13 = 0, dx12 = 0, dx23 = 0;
-
-			if (v3.y != v1.y)
-			{
-				dx13 = int_to_fixed(v3.x - v1.x);
-				dx13 /= v3.y - v1.y;
-			}
-			else
-			{
-				dx13 = 0;
-			}
-
-			if (v2.y != v1.y)
-			{
-				dx12 = int_to_fixed(v2.x - v1.x);
-				dx12 /= (v2.y - v1.y);
-			}
-			else
-			{
-				dx12 = 0;
-			}
-
-			if (v3.y != v2.y)
-			{
-				dx23 = int_to_fixed(v3.x - v3.x);
-				dx23 /= (v3.y - v2.y);
-			}
-			else
-			{
-				dx23 = 0;
-			}
-
-			int wx1 = int_to_fixed(v1.x);
-			int wx2 = wx1; 
-			int _dx13 = dx13;
-
+			float dx13 = (v3.y != v1.y) ? ((float)(v3.x - v1.x)) / (v3.y - v1.y) : 0;
+			float dx12 = (v2.y != v1.y) ? ((float)(v2.x - v1.x)) / (v2.y - v1.y) : 0;
+			float dx23 = (v3.y != v2.y) ? ((float)(v3.x - v2.x)) / (v3.y - v2.y) : 0;
+			float _dx13 = dx13;
+			float wx1 = v1.x;
+			float wx2 = wx1;
+			
 			if (dx13 > dx12)
-			{
 				Swap(ref dx13, ref dx12);
-			}
+
 			for (int i = v1.y; i < v2.y; ++i)
 			{
-				for (int j = fixed_to_int(wx1); j <= fixed_to_int(wx2); ++j)
-				{
+				for (int j = Convert.ToInt32(wx1); j <= Convert.ToInt32(wx2); ++j)
 					bitMask[i, j] = true;
-				}
 				wx1 += dx13;
 				wx2 += dx12;
 			}
+
 			if (v1.y == v2.y)
 			{
-				wx1 = int_to_fixed(v1.x);
-				wx2 = int_to_fixed(v2.x);
+				wx1 = v1.x;
+				wx2 = v2.x;
 			}
 			if (_dx13 < dx23)
-			{
 				Swap(ref _dx13, ref dx23);
-			}
+
 			for (int i = v2.y; i <= v3.y; i++)
 			{
-				for (int j = fixed_to_int(wx1); j <= fixed_to_int(wx2); j++)
-				{
+				for (int j = Convert.ToInt32(wx1); j <= Convert.ToInt32(wx2); j++)
 					bitMask[i, j] = true;
-				}
 				wx1 += _dx13;
 				wx2 += dx23;
 			}
