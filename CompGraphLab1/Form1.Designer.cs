@@ -88,7 +88,7 @@ namespace CompGraphLab1
             this.OYAngleRotationTextBox.Name = "OYAngleRotationTextBox";
             this.OYAngleRotationTextBox.Size = new System.Drawing.Size(58, 27);
             this.OYAngleRotationTextBox.TabIndex = 4;
-            this.OYAngleRotationTextBox.Text = "0";
+            this.OYAngleRotationTextBox.Text = "30";
             // 
             // OZLabel
             // 
