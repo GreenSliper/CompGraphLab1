@@ -15,6 +15,7 @@ namespace CompGraphLab1
 {
 	public partial class Form1 : Form
 	{
+		System.Media.SoundPlayer player = new System.Media.SoundPlayer();
 		Camera cam;
 		//IMeshProjector meshProjector = new MeshProjector();
 		Renderer zbb = new Renderer();
@@ -23,6 +24,8 @@ namespace CompGraphLab1
 		public Form1()
 		{
 			InitializeComponent();
+			player.SoundLocation = @"..\..\..\Sources\sus.wav";
+			player.PlayLooping();
 			cam = new Camera() { 
 				localPosition = Vector3.Zero,
 				horizontalAngle = 60,
@@ -33,7 +36,7 @@ namespace CompGraphLab1
 				localPosition = Vector3.Forward * 5,
 				localScale = Vector3.One,
 				localRotation = Vector3.Up*30,
-				objData = loader.LoadFile(@"C:\Users\Igor\Desktop\amogus.obj"),
+				objData = loader.LoadFile(@"..\..\..\Sources\amogus.obj"),
 				baseColor = new Vector3(1, 0, 0)
 			};
 			mesh1 = new MeshTransform()
@@ -41,7 +44,7 @@ namespace CompGraphLab1
 				localPosition = Vector3.Forward * 5,
 				localScale = Vector3.One,
 				localRotation = Vector3.Up * 30,
-				objData = loader.LoadFile(@"C:\Users\Igor\Desktop\amogus_visor.obj"),
+				objData = loader.LoadFile(@"..\..\..\Sources\amogus_visor.obj"),
 				baseColor = new Vector3(0, 0, 1)
 			};
 			mesh2 = new MeshTransform()
@@ -49,7 +52,7 @@ namespace CompGraphLab1
 				localPosition = Vector3.Forward * 5,
 				localScale = Vector3.One,
 				localRotation = Vector3.Up * 30,
-				objData = loader.LoadFile(@"C:\Users\Igor\Desktop\Letters.obj"),
+				objData = loader.LoadFile(@"..\..\..\Sources\Letters.obj"),
 				baseColor = new Vector3(1, 0, 1)
 			};
 		}
@@ -68,7 +71,37 @@ namespace CompGraphLab1
 		}
 
 		int xSz = 1000, ySz = 1000;
-		DirectionalLight light = new DirectionalLight() { localRotation = new Vector3(-60, 180, 0) };
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+			string[] AngleRotationStr = new string[] {
+				this.OXAngleRotationTextBox.Text,
+				this.OYAngleRotationTextBox.Text,
+				this.OZAngleRotationTextBox.Text
+			};
+			try
+			{
+				int[] AngleRotation = new int[AngleRotationStr.GetLength(0)];
+				for (int i = 0; i < AngleRotation.GetLength(0); ++i)
+                {
+					AngleRotation[i] = Int32.Parse(AngleRotationStr[i]);
+					if (Math.Abs(AngleRotation[i]) > 180)
+						throw new ArgumentOutOfRangeException();
+				}
+				Vector3 eulerAngles = new Vector3(AngleRotation[0], AngleRotation[1], AngleRotation[2]);
+				foreach (var _mesh in new MeshTransform[] { mesh, mesh1, mesh2 })
+					for (int i = 0; i < _mesh.objData.tris.Count(); ++i)
+						for (int j = 0; j < _mesh.objData.tris[i].verts.GetLength(0); ++j)
+							_mesh.objData.tris[i].verts[j] = _mesh.objData.tris[i].verts[j].Rotate(eulerAngles);
+				this.Invalidate();
+			}
+			catch (Exception)
+			{
+				MessageBox.Show(@"You have entered incorrect data", @"Error");
+			}
+		}
+
+        DirectionalLight light = new DirectionalLight() { localRotation = new Vector3(-60, 180, 0) };
 		Bitmap img = new Bitmap(1000, 1000);
 		private void Form1_Paint(object sender, PaintEventArgs e)
 		{
