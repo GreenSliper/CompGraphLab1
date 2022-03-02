@@ -19,11 +19,15 @@ namespace CompGraphLab1
 		//IMeshProjector meshProjector = new MeshProjector();
 		Renderer zbb = new Renderer();
 		IObjLoader loader = new ObjLoader();
-		MeshTransform mesh, mesh1;
+		MeshTransform mesh, mesh1, mesh2;
 		public Form1()
 		{
 			InitializeComponent();
-			cam = new Camera() { localPosition = Vector3.Zero, horizontalAngle = 60, verticalAngle = 60, renderPlaneDistance = 1f};
+			cam = new Camera() { 
+				localPosition = Vector3.Zero,
+				horizontalAngle = 60,
+				verticalAngle = 60,
+				renderPlaneDistance = .1f };
 			mesh = new MeshTransform()
 			{
 				localPosition = Vector3.Forward * 5,
@@ -40,6 +44,14 @@ namespace CompGraphLab1
 				objData = loader.LoadFile(@"C:\Users\Igor\Desktop\amogus_visor.obj"),
 				baseColor = new Vector3(0, 0, 1)
 			};
+			mesh2 = new MeshTransform()
+			{
+				localPosition = Vector3.Forward * 5,
+				localScale = Vector3.One,
+				localRotation = Vector3.Up * 30,
+				objData = loader.LoadFile(@"C:\Users\Igor\Desktop\Letters.obj"),
+				baseColor = new Vector3(1, 0, 1)
+			};
 		}
 
 		private void Ticker_Tick(object sender, EventArgs e)
@@ -55,19 +67,20 @@ namespace CompGraphLab1
 				c1.B + (int)MathF.Round((c2.B - c1.B) * t));
 		}
 
+		int xSz = 1000, ySz = 1000;
 		DirectionalLight light = new DirectionalLight() { localRotation = new Vector3(-60, 180, 0) };
-		Bitmap img = new Bitmap(600, 600);
+		Bitmap img = new Bitmap(1000, 1000);
 		private void Form1_Paint(object sender, PaintEventArgs e)
 		{
-			var render = new Color[600, 600];
-			var zb = zbb.RenderZBufferFillPoly(new Vector2Int(600, 600), new List<MeshTransform>() { mesh, mesh1 }, cam, 
+			var render = new Color[xSz, ySz];
+			var zb = zbb.RenderZBufferFillPoly(new Vector2Int(xSz, ySz), new List<MeshTransform>() { mesh, mesh1, mesh2 }, cam, 
 				(msh, tri)=>SimpleLightShader.GetTriangleColor(msh, tri, light), render);
 			for (int x = 0; x < zb.GetLength(0); x++)
 				for (int y = 0; y < zb.GetLength(1); y++)
 				{
 					if (zb[x, y] != float.MaxValue)
 					{
-						float t = MathF.Pow(zb[x, y], 4) / 1000;
+						float t = MathF.Min(1, MathF.Max(0, MathF.Pow(zb[x, y], 4) / 1500));
 						zb[x, y] = MathF.Min(255, 512 / zb[x, y]);
 						int z = (int)MathF.Round(zb[x, y]);
 						img.SetPixel(x, y, Lerp(render[x, y], Color.FromArgb(z/2, z/4, z), t));
