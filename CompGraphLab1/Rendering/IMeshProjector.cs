@@ -8,6 +8,7 @@ namespace CompGraphLab1.Rendering
 {
 	public interface IMeshProjector
 	{
-		ObjPlanaredData Project(ObjData mesh, Camera camera);
+		void InitCameraState(Camera camera);
+		ObjPlanaredData Project(ObjData mesh);
 	}
 }

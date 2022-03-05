@@ -14,21 +14,24 @@ namespace CompGraphLab1.Scene
 		public Vector3 baseColor = new Vector3(Color.White)/255;
 		public ObjData objData;
 
-		public ObjData DataToWorldSpace()
+		public ObjData DataToWorldSpace(bool removeInvertedTris = true, Vector3 eyePosition = default, Vector3 eyeNormal = default)
 		{
 			var offs = Position;
-			var rot = Rotation;
+			var rot = Vector3.GetRotationMatrix(Rotation);
 			//copy data
-			ObjData result = new ObjData();
-
+			ObjData result = new ObjData() { tris = new List<Triangle3D>(objData.tris.Count / (removeInvertedTris ? 2 : 1)) };
 			for(int i = 0; i < objData.tris.Count; i++)
 			{
-				result.tris.Add(new Triangle3D(objData.tris[i].verts[0], objData.tris[i].verts[1], objData.tris[i].verts[2]));
+				var tri = new Triangle3D(objData.tris[i].verts[0], objData.tris[i].verts[1], objData.tris[i].verts[2]);
 				for (int j = 0; j < 3; j++)
 				{
-					result.tris[i].verts[j] = result.tris[i].verts[j].Rotate(Rotation);
-					result.tris[i].verts[j] += offs;
+					tri.verts[j] = tri.verts[j].Rotate(rot);
+					tri.verts[j] += offs;
 				}
+				if (removeInvertedTris && tri.Normal.Angle(eyeNormal) < MathF.PI / 2)
+					continue;
+				else
+					result.tris.Add(tri);
 			}
 			return result;
 		}

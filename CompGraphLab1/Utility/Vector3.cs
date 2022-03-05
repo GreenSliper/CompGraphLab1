@@ -65,6 +65,11 @@ namespace CompGraphLab1
 			return MathF.Acos(Dot(other) / (Magnitude() * other.Magnitude()));
 		}
 
+		public float AngleCos(Vector3 other)
+		{
+			return Dot(other) / (Magnitude() * other.Magnitude());
+		}
+
 		/// <summary>
 		/// Angle between two vectors in degrees
 		/// </summary>
@@ -102,6 +107,36 @@ namespace CompGraphLab1
 				  {0, 0, 1 }
 				});
 			var result = rx * ry * rz * new Matrix(new float[,] { { x }, { y }, { z } });
+			return new Vector3(result[0, 0], result[1, 0], result[2, 0]);
+		}
+
+		public static Matrix GetRotationMatrix(Vector3 eulerAngles)
+		{
+			eulerAngles *= MathF.PI / 180f;
+			Matrix rx = new Matrix(new float[,]
+				{
+				  {1, 0, 0 },
+				  {0, MathF.Cos(eulerAngles.x), -MathF.Sin(eulerAngles.x) },
+				  {0, MathF.Sin(eulerAngles.x), MathF.Cos(eulerAngles.x) }
+				});
+			Matrix ry = new Matrix(new float[,]
+				{
+				  {MathF.Cos(eulerAngles.y), 0, MathF.Sin(eulerAngles.y) },
+				  {0, 1, 0 },
+				  {-MathF.Sin(eulerAngles.y), 0, MathF.Cos(eulerAngles.y) }
+				});
+			Matrix rz = new Matrix(new float[,]
+				{
+				  {MathF.Cos(eulerAngles.z), -MathF.Sin(eulerAngles.z), 0 },
+				  {MathF.Sin(eulerAngles.z), MathF.Cos(eulerAngles.z), 0 },
+				  {0, 0, 1 }
+				});
+			return rx * ry * rz;
+		}
+
+		public Vector3 Rotate(Matrix rotationMatrix)
+		{
+			var result = rotationMatrix * new Matrix(new float[,] { { x }, { y }, { z } });
 			return new Vector3(result[0, 0], result[1, 0], result[2, 0]);
 		}
 

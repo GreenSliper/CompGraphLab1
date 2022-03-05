@@ -11,7 +11,7 @@ namespace CompGraphLab1.Rendering
 	{
 		public static Color GetTriangleColor(MeshTransform mesh, Triangle3D triangle, DirectionalLight light)
 		{
-			var cos = MathF.Cos(triangle.Normal.Angle(light.Normal));
+			var cos = triangle.Normal.AngleCos(light.Normal);
 			if (cos >= 0)
 				return (mesh.baseColor.Multiply(light.baseColor) * cos * 255).ToColor();
 			else

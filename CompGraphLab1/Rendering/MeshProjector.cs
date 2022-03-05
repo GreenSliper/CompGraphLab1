@@ -10,46 +10,54 @@ namespace CompGraphLab1.Rendering
 {
 	class MeshProjector : IMeshProjector
 	{
-		public ObjPlanaredData Project(ObjData mesh, Camera camera)
+		Vector3 camNorm, camPos, canvasUp, canvasRight, canvasLeftBottomCorner;
+		float renderPlaneDist, canvasRightMagnitude, canvasUpMagnitude;
+		public void InitCameraState(Camera camera)
 		{
-			var camNorm = camera.Normal;
-			var camPos = camera.Position;
-			Vector3 canvasUp = camera.Up * MathF.Tan(camera.verticalAngle/360f*MathF.PI) * 2f * camera.renderPlaneDistance;
-			Vector3 canvasRight = camera.Right * MathF.Tan(camera.horizontalAngle / 360f * MathF.PI) * 2f * camera.renderPlaneDistance;
-			Vector3 canvasLeftBottomCorner = camera.Normal - canvasRight / 2 - canvasUp / 2 + camPos;
+			camNorm = camera.Normal;
+			camPos = camera.Position;
+			canvasUp = camera.Up * MathF.Tan(camera.verticalAngle / 360f * MathF.PI) * 2f * camera.renderPlaneDistance;
+			canvasRight = camera.Right * MathF.Tan(camera.horizontalAngle / 360f * MathF.PI) * 2f * camera.renderPlaneDistance;
+			canvasLeftBottomCorner = camera.Normal - canvasRight / 2 - canvasUp / 2 + camPos;
+			canvasRightMagnitude = canvasRight.Magnitude();
+			canvasUpMagnitude = canvasUp.Magnitude();
+			renderPlaneDist = camera.renderPlaneDistance;
+		}
+
+		public ObjPlanaredData Project(ObjData mesh)
+		{
+			
 			ConcurrentBag<Triangle2D> resultTris = new ConcurrentBag<Triangle2D>();
-			Parallel.ForEach(mesh.tris,
-				(tri) =>
-				{
-					var v1 = ConvertRenderPlaneCoordToViewRect(
-								ProjectOnRenderPlane3D(tri.verts[0], camPos, camNorm, camera.renderPlaneDistance, out var v1Z),
+			Triangle2D[] resultTrs = new Triangle2D[mesh.tris.Count];
+			Parallel.For(0, mesh.tris.Count, (x) =>
+			{
+				var v1 = ConvertRenderPlaneCoordToViewRect(
+								ProjectOnRenderPlane3D(mesh.tris[x].verts[0], out var v1Z),
 								canvasLeftBottomCorner, canvasUp, canvasRight);
-					var v2 = ConvertRenderPlaneCoordToViewRect(
-								ProjectOnRenderPlane3D(tri.verts[1], camPos, camNorm, camera.renderPlaneDistance, out var v2Z),
-								canvasLeftBottomCorner, canvasUp, canvasRight);
-					var v3 = ConvertRenderPlaneCoordToViewRect(
-								ProjectOnRenderPlane3D(tri.verts[2], camPos, camNorm, camera.renderPlaneDistance, out var v3Z),
-								canvasLeftBottomCorner, canvasUp, canvasRight);
-					resultTris.Add(new Triangle2D(v1, v2, v3, v1Z, v2Z, v3Z, tri));
-				});
-			return new ObjPlanaredData() { tris = new List<Triangle2D>(resultTris)};
+				var v2 = ConvertRenderPlaneCoordToViewRect(
+							ProjectOnRenderPlane3D(mesh.tris[x].verts[1], out var v2Z),
+							canvasLeftBottomCorner, canvasUp, canvasRight);
+				var v3 = ConvertRenderPlaneCoordToViewRect(
+							ProjectOnRenderPlane3D(mesh.tris[x].verts[2], out var v3Z),
+							canvasLeftBottomCorner, canvasUp, canvasRight);
+				resultTrs[x] = new Triangle2D(v1, v2, v3, v1Z, v2Z, v3Z, mesh.tris[x]);
+			});
+			return new ObjPlanaredData() { tris = new List<Triangle2D>(resultTrs) };
 		}
 
-		public static Vector3 ProjectOnRenderPlane3D(Vector3 sourcePoint, Vector3 cameraPos, Vector3 cameraNormal, float renderPlaneDist, 
-			out float distance)
+		public Vector3 ProjectOnRenderPlane3D(Vector3 sourcePoint, out float distance)
 		{
-			var delta = sourcePoint - cameraPos;
-			var normal = cameraNormal;
+			var delta = sourcePoint - camPos;
 			distance = delta.Magnitude();
-			return cameraPos + delta / distance * renderPlaneDist / MathF.Cos(delta.Angle(normal));
+			return camPos + delta / distance * renderPlaneDist / delta.AngleCos(camNorm);
 		}
 
-		public static Vector2 ConvertRenderPlaneCoordToViewRect(Vector3 pointOnRenderPlane, Vector3 canvasLeftBottomCorner, 
+		public Vector2 ConvertRenderPlaneCoordToViewRect(Vector3 pointOnRenderPlane, Vector3 canvasLeftBottomCorner, 
 			Vector3 canvasUp, Vector3 canvasRight)
 		{
 			Vector3 delta = pointOnRenderPlane - canvasLeftBottomCorner;
-			var x = delta.Project(canvasRight, out bool negX).Magnitude() / canvasRight.Magnitude();
-			var y = delta.Project(canvasUp, out bool negY).Magnitude() / canvasUp.Magnitude();
+			var x = delta.Project(canvasRight, out bool negX).Magnitude() / canvasRightMagnitude;
+			var y = delta.Project(canvasUp, out bool negY).Magnitude() / canvasUpMagnitude;
 			return new Vector2(negX ? -x : x, negY ? -y : y);
 		}
 	}
