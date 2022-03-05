@@ -80,6 +80,17 @@ namespace CompGraphLab1
             _matrix = _result;
         }
 
+        public Vector3 Multiply(Vector3 vector)
+        {
+            Vector3 result = new Vector3();
+            if (Columns != 3 || Rows!=3)
+                throw new InvalidOperationException("Cannot multiply matrices of different sizes.");
+            result.x = _matrix[0, 0] * vector.x + _matrix[0, 1]*vector.y + _matrix[0, 2]*vector.z;
+            result.y = _matrix[1, 0] * vector.x + _matrix[1, 1]*vector.y + _matrix[1, 2]*vector.z;
+            result.z = _matrix[2, 0] * vector.x + _matrix[2, 1]*vector.y + _matrix[2, 2]*vector.z;
+            return result;
+        }
+
         public void HadamardProduct(Matrix Matrix)
         {
             if (Columns != Matrix.Columns || Rows != Matrix.Rows)
@@ -241,6 +252,12 @@ namespace CompGraphLab1
             var result = first.Duplicate();
             result.Multiply(second);
             return result;
+        }
+
+        public static Vector3 operator *(Matrix first, Vector3 second)
+        {
+            var result = first.Duplicate();
+            return result.Multiply(second);
         }
 
         public static Matrix operator *(Matrix matrix, float scalar)

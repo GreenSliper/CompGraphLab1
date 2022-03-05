@@ -87,26 +87,7 @@ namespace CompGraphLab1
 		/// <returns>Rotated vector</returns>
 		public Vector3 Rotate(Vector3 eulerAngles)
 		{
-			eulerAngles *= MathF.PI / 180f;
-			Matrix rx = new Matrix(new float[,] 
-				{
-				  {1, 0, 0 },
-				  {0, MathF.Cos(eulerAngles.x), -MathF.Sin(eulerAngles.x) },
-				  {0, MathF.Sin(eulerAngles.x), MathF.Cos(eulerAngles.x) }
-				});
-			Matrix ry = new Matrix(new float[,]
-				{
-				  {MathF.Cos(eulerAngles.y), 0, MathF.Sin(eulerAngles.y) },
-				  {0, 1, 0 },
-				  {-MathF.Sin(eulerAngles.y), 0, MathF.Cos(eulerAngles.y) }
-				});
-			Matrix rz = new Matrix(new float[,]
-				{
-				  {MathF.Cos(eulerAngles.z), -MathF.Sin(eulerAngles.z), 0 },
-				  {MathF.Sin(eulerAngles.z), MathF.Cos(eulerAngles.z), 0 },
-				  {0, 0, 1 }
-				});
-			var result = rx * ry * rz * new Matrix(new float[,] { { x }, { y }, { z } });
+			var result = GetRotationMatrix(eulerAngles) * new Matrix(new float[,] { { x }, { y }, { z } });
 			return new Vector3(result[0, 0], result[1, 0], result[2, 0]);
 		}
 
@@ -136,8 +117,7 @@ namespace CompGraphLab1
 
 		public Vector3 Rotate(Matrix rotationMatrix)
 		{
-			var result = rotationMatrix * new Matrix(new float[,] { { x }, { y }, { z } });
-			return new Vector3(result[0, 0], result[1, 0], result[2, 0]);
+			return rotationMatrix * this;
 		}
 
 		public Vector3 Multiply(Vector3 other)
