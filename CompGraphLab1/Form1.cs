@@ -57,12 +57,6 @@ namespace CompGraphLab1
 			};
 			CreateImage();
 		}
-
-		private void Ticker_Tick(object sender, EventArgs e)
-		{
-			//mesh.localRotation += Vector3.Up*15f;
-			//Invalidate();
-		}
 		
 		private Color Lerp(Color c1, Color c2, float t)
 		{
