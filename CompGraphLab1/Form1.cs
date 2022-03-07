@@ -33,37 +33,7 @@ namespace CompGraphLab1
 				horizontalAngle = 60,
 				verticalAngle = 60,
 				renderPlaneDistance = .1f };
-			/*mesh = new MeshTransform()
-			{
-				localPosition = Vector3.Forward * 5,
-				localScale = Vector3.One,
-				localRotation = Vector3.Up*30,
-				objData = loader.LoadFile(@"..\..\..\Sources\amogus.obj"),
-				baseColor = new Vector3(1, 0, 0)
-			};
-			mesh1 = new MeshTransform()
-			{
-				localPosition = Vector3.Forward * 5,
-				localScale = Vector3.One,
-				localRotation = Vector3.Up * 30,
-				objData = loader.LoadFile(@"..\..\..\Sources\amogus_visor.obj"),
-				baseColor = new Vector3(0, 0, 1)
-			};
-			mesh2 = new MeshTransform()
-			{
-				localPosition = Vector3.Forward * 5,
-				localScale = Vector3.One,
-				localRotation = Vector3.Up * 30,
-				objData = loader.LoadFile(@"..\..\..\Sources\Letters.obj"),
-				baseColor = new Vector3(1, 0, 1)
-			};*/
 			CreateImage();
-		}
-
-		private void Ticker_Tick(object sender, EventArgs e)
-		{
-			//mesh.localRotation += Vector3.Up*15f;
-			//Invalidate();
 		}
 		
 		private Color Lerp(Color c1, Color c2, float t)
@@ -198,17 +168,23 @@ namespace CompGraphLab1
 		private void Form1_Paint(object sender, PaintEventArgs e)
 		{
 			e.Graphics.DrawImage(img, 0, 0);
-			/*
-			var planar = new MeshProjector().Project(mesh.DataToWorldSpace(), cam);
+		}
+
+		private void DrawWireframeObjectNative(MeshTransform mesh, PaintEventArgs e)
+		{
+			var meshProj = new MeshProjector();
+			meshProj.InitCameraState(cam);
+			var planar = meshProj.Project(mesh.DataToWorldSpace());
 			foreach (var tri in planar.tris)
 			{
-				e.Graphics.DrawLine(new Pen(Color.Blue), (int)(tri.verts[0].x*600), (int)(tri.verts[0].y * 600), 
+				e.Graphics.DrawLine(new Pen(Color.Blue), (int)(tri.verts[0].x * 600), (int)(tri.verts[0].y * 600),
 					(int)(tri.verts[1].x * 600), (int)(tri.verts[1].y * 600));
 				e.Graphics.DrawLine(new Pen(Color.Blue), (int)(tri.verts[2].x * 600), (int)(tri.verts[2].y * 600),
 					(int)(tri.verts[1].x * 600), (int)(tri.verts[1].y * 600));
 				e.Graphics.DrawLine(new Pen(Color.Blue), (int)(tri.verts[2].x * 600), (int)(tri.verts[2].y * 600),
 					(int)(tri.verts[0].x * 600), (int)(tri.verts[0].y * 600));
-			}*/
+			}
 		}
+
 	}
 }
