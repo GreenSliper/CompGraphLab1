@@ -85,7 +85,7 @@ namespace CompGraphLab1
 			this.OYAngleRotationTextBox.Name = "OYAngleRotationTextBox";
 			this.OYAngleRotationTextBox.Size = new System.Drawing.Size(58, 27);
 			this.OYAngleRotationTextBox.TabIndex = 4;
-			this.OYAngleRotationTextBox.Text = "30";
+			this.OYAngleRotationTextBox.Text = "0";
 			// 
 			// OZLabel
 			// 
@@ -108,9 +108,9 @@ namespace CompGraphLab1
 			// 
 			this.toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
 			this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.toolStripButton1,
-			this.toolStripButton2,
-			this.toolStripButton3});
+            this.toolStripButton1,
+            this.toolStripButton2,
+            this.toolStripButton3});
 			this.toolStrip1.Location = new System.Drawing.Point(0, 0);
 			this.toolStrip1.Name = "toolStrip1";
 			this.toolStrip1.Size = new System.Drawing.Size(582, 27);

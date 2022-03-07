@@ -15,8 +15,8 @@ namespace CompGraphLab1.Rendering
 		ITriangleSelector triangleSelector = new TriangleSelector();
 		IMeshProjector meshProjector = new MeshProjector();
 		IRasterizer rasterizer = new AltRasterizer();
-		public float[,] RenderZBufferFillPoly(Vector2Int screenSize, IEnumerable<MeshTransform> sceneMeshes, Camera camera,
-			Func<MeshTransform, Triangle3D, Color> renderFunction, Color[,] render)
+		public float[,] RenderZBufferFillPoly(Vector2Int screenSize, IEnumerable<MeshTransform> sceneMeshes, 
+			DirectionalLight light, Camera camera, Color[,] render)
 		{
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
@@ -53,17 +53,17 @@ namespace CompGraphLab1.Rendering
 
 			foreach (var rasterMesh in rasteredMeshes)
 				foreach (var triData in rasterMesh.Item1)
-					ProcessTriangle(triData.rasterData, screenSize, zbuffer, renderFunction, rasterMesh.Item2, triData.tri, render);
+					ProcessTriangle(triData.rasterData, screenSize, zbuffer, light, rasterMesh.Item2, triData.tri, render);
 			sw.Stop();
 			var t = sw.ElapsedMilliseconds;
 
 			return zbuffer;
 		}
 
-		void ProcessTriangle(RasterTriangleData rastTri, Vector2Int screenSize, float[,] zbuffer,
-			Func<MeshTransform, Triangle3D, Color> renderFunction, MeshTransform mesh, Triangle3D tri, Color[,] render)
+		void ProcessTriangle(RasterTriangleData rastTri, Vector2Int screenSize, float[,] zbuffer, DirectionalLight light,
+			MeshTransform mesh, Triangle3D tri, Color[,] render)
 		{
-			var color = renderFunction(mesh, tri);
+			var color = mesh.triangleShader(mesh, tri, light);
 			InitZCalc(rastTri);
 			for (int x = 0; x < rastTri.bitMask.GetLength(0); x++)
 				for (int y = 0; y < rastTri.bitMask.GetLength(1); y++)

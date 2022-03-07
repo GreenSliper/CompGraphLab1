@@ -21,7 +21,8 @@ namespace CompGraphLab1
 		//IMeshProjector meshProjector = new MeshProjector();
 		Renderer zbb = new Renderer();
 		IObjLoader loader = new ObjLoader();
-		List<MeshTransform> meshs = new List<MeshTransform>();
+		List<MeshTransform> meshes = new List<MeshTransform>();
+		MeshTransform[] axises;
 		//MeshTransform mesh, mesh1, mesh2;
 		public Form1()
 		{
@@ -30,11 +31,45 @@ namespace CompGraphLab1
 			player.PlayLooping();
 			cam = new Camera()
 			{
-				localPosition = Vector3.Zero,
+				localPosition = Vector3.Right*2,
+				localRotation = Vector3.Up*-30,
 				horizontalAngle = 60,
 				verticalAngle = 60,
 				renderPlaneDistance = .1f
 			};
+			axises = new MeshTransform[3]
+				{
+					//x
+					new MeshTransform()
+					{
+						localPosition = Vector3.Forward * 5 + Vector3.Up*2,
+						localScale = Vector3.One,
+						localRotation = Vector3.Forward * 90,
+						triangleShader = Shaders.UnlitColor,
+						objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
+						baseColor = new Vector3(1, 0, 0)
+					},
+					//y
+					new MeshTransform()
+					{
+						localPosition = Vector3.Forward * 5 + Vector3.Up*2,
+						localScale = Vector3.One,
+						localRotation = Vector3.Right*180,
+						triangleShader = Shaders.UnlitColor,
+						objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
+						baseColor = new Vector3(0, 1, 0)
+					},
+					//z
+					new MeshTransform()
+					{
+						localPosition = Vector3.Forward * 5 + Vector3.Up*2,
+						localScale = Vector3.One,
+						localRotation = Vector3.Right*270,
+						triangleShader = Shaders.UnlitColor,
+						objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
+						baseColor = new Vector3(0, 0, 1)
+					}
+				};
 			CreateImage();
 		}
 
@@ -59,12 +94,12 @@ namespace CompGraphLab1
 				int[] AngleRotation = new int[AngleRotationStr.GetLength(0)];
 				for (int i = 0; i < AngleRotation.GetLength(0); ++i)
 				{
-					AngleRotation[i] = Int32.Parse(AngleRotationStr[i]);
+					AngleRotation[i] = int.Parse(AngleRotationStr[i]);
 					if (Math.Abs(AngleRotation[i]) > 180)
 						throw new ArgumentOutOfRangeException();
 				}
 				Vector3 eulerAngles = new Vector3(AngleRotation[0], AngleRotation[1], AngleRotation[2]);
-				foreach (var _mesh in meshs)
+				foreach (var _mesh in meshes)
 					_mesh.localRotation = eulerAngles;
 				CreateImage();
 				Invalidate();
@@ -90,7 +125,7 @@ namespace CompGraphLab1
 				try
 				{
 					var loadObjData = loader.LoadFile(filePath);
-					meshs.Add(new MeshTransform()
+					meshes.Add(new MeshTransform()
 					{
 						localPosition = Vector3.Forward * 5,
 						localScale = Vector3.One,
@@ -110,34 +145,34 @@ namespace CompGraphLab1
 
 		private void toolStripButton2_Click(object sender, EventArgs e)
 		{
-			meshs.Clear();
+			meshes.Clear();
 			CreateImage();
 			Invalidate();
 		}
 
 		private void toolStripButton3_Click(object sender, EventArgs e)
 		{
-			meshs.Add(new MeshTransform()
+			meshes.Add(new MeshTransform()
 			{
 				localPosition = Vector3.Forward * 5,
 				localScale = Vector3.One,
-				localRotation = Vector3.Up * 30,
+				localRotation = Vector3.Zero,
 				objData = loader.LoadFile(@"..\..\..\Sources\amogus.obj"),
 				baseColor = new Vector3(1, 0, 0)
 			});
-			meshs.Add(new MeshTransform()
+			meshes.Add(new MeshTransform()
 			{
 				localPosition = Vector3.Forward * 5,
 				localScale = Vector3.One,
-				localRotation = Vector3.Up * 30,
+				localRotation = Vector3.Zero,
 				objData = loader.LoadFile(@"..\..\..\Sources\amogus_visor.obj"),
 				baseColor = new Vector3(0, 0, 1)
 			});
-			meshs.Add(new MeshTransform()
+			meshes.Add(new MeshTransform()
 			{
 				localPosition = Vector3.Forward * 5,
 				localScale = Vector3.One,
-				localRotation = Vector3.Up * 30,
+				localRotation = Vector3.Zero,
 				objData = loader.LoadFile(@"..\..\..\Sources\Letters.obj"),
 				baseColor = new Vector3(1, 0, 1)
 			});
@@ -150,14 +185,14 @@ namespace CompGraphLab1
 		private void CreateImage()
 		{
 			var render = new Color[xSz, ySz];
-			var zb = zbb.RenderZBufferFillPoly(new Vector2Int(xSz, ySz), meshs, cam,
-				(msh, tri) => SimpleLightShader.GetTriangleColor(msh, tri, light), render);
+			var zb = zbb.RenderZBufferFillPoly(new Vector2Int(xSz, ySz), meshes.Concat(axises),
+				light, cam, render);
 			for (int x = 0; x < zb.GetLength(0); x++)
 				for (int y = 0; y < zb.GetLength(1); y++)
 				{
 					if (zb[x, y] != float.MaxValue)
 					{
-						float t = MathF.Min(1, MathF.Max(0, MathF.Pow(zb[x, y], 4) / 1500));
+						float t = MathF.Min(1, MathF.Max(0, MathF.Pow(zb[x, y], 4) / 2000));
 						zb[x, y] = MathF.Min(255, 512 / zb[x, y]);
 						int z = (int)MathF.Round(zb[x, y]);
 						img.SetPixel(x, y, Lerp(render[x, y], Color.FromArgb(z / 2, z / 4, z), t));

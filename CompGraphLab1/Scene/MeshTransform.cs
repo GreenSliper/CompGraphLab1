@@ -1,4 +1,5 @@
 ﻿using CompGraphLab1.Data;
+using CompGraphLab1.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -13,6 +14,7 @@ namespace CompGraphLab1.Scene
 	{
 		public Vector3 baseColor = new Vector3(Color.White)/255;
 		public ObjData objData;
+		public Func<MeshTransform, Triangle3D, DirectionalLight, Color> triangleShader = Shaders.DiffuseColor;
 
 		public ObjData DataToWorldSpace(bool removeInvertedTris = true, Vector3 eyePosition = default, Vector3 eyeNormal = default)
 		{

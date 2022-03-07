@@ -7,15 +7,19 @@ using System.Text;
 
 namespace CompGraphLab1.Rendering
 {
-	public static class SimpleLightShader
+	public static class Shaders
 	{
-		public static Color GetTriangleColor(MeshTransform mesh, Triangle3D triangle, DirectionalLight light)
+		public static Color DiffuseColor(MeshTransform mesh, Triangle3D triangle, DirectionalLight light)
 		{
 			var cos = triangle.Normal.AngleCos(light.Normal);
 			if (cos >= 0)
 				return (mesh.baseColor.Multiply(light.baseColor) * cos * 255).ToColor();
 			else
 				return Color.Black;
+		}
+		public static Color UnlitColor(MeshTransform mesh, Triangle3D triangle, DirectionalLight light)
+		{
+			return (mesh.baseColor*255).ToColor();
 		}
 	}
 }
