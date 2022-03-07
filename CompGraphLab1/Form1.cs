@@ -121,7 +121,11 @@ namespace CompGraphLab1
 		private void Form1_Paint(object sender, PaintEventArgs e)
 		{
 			e.Graphics.DrawImage(img, 0, 0);
-			/*
+			
+		}
+
+		private void DrawWireframeNative(PaintEventArgs e)
+		{
 			var planar = new MeshProjector().Project(mesh.DataToWorldSpace(), cam);
 			foreach (var tri in planar.tris)
 			{
@@ -131,7 +135,7 @@ namespace CompGraphLab1
 					(int)(tri.verts[1].x * 600), (int)(tri.verts[1].y * 600));
 				e.Graphics.DrawLine(new Pen(Color.Blue), (int)(tri.verts[2].x * 600), (int)(tri.verts[2].y * 600),
 					(int)(tri.verts[0].x * 600), (int)(tri.verts[0].y * 600));
-			}*/
+			}
 		}
 	}
 }
