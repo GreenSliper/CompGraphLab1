@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +21,8 @@ namespace CompGraphLab1
 		//IMeshProjector meshProjector = new MeshProjector();
 		Renderer zbb = new Renderer();
 		IObjLoader loader = new ObjLoader();
-		MeshTransform mesh, mesh1, mesh2;
+		List<MeshTransform> meshs = new List<MeshTransform>();
+		//MeshTransform mesh, mesh1, mesh2;
 		public Form1()
 		{
 			InitializeComponent();
@@ -31,30 +33,6 @@ namespace CompGraphLab1
 				horizontalAngle = 60,
 				verticalAngle = 60,
 				renderPlaneDistance = .1f };
-			mesh = new MeshTransform()
-			{
-				localPosition = Vector3.Forward * 5,
-				localScale = Vector3.One,
-				localRotation = Vector3.Up*30,
-				objData = loader.LoadFile(@"..\..\..\Sources\amogus.obj"),
-				baseColor = new Vector3(1, 0, 0)
-			};
-			mesh1 = new MeshTransform()
-			{
-				localPosition = Vector3.Forward * 5,
-				localScale = Vector3.One,
-				localRotation = Vector3.Up * 30,
-				objData = loader.LoadFile(@"..\..\..\Sources\amogus_visor.obj"),
-				baseColor = new Vector3(0, 0, 1)
-			};
-			mesh2 = new MeshTransform()
-			{
-				localPosition = Vector3.Forward * 5,
-				localScale = Vector3.One,
-				localRotation = Vector3.Up * 30,
-				objData = loader.LoadFile(@"..\..\..\Sources\Letters.obj"),
-				baseColor = new Vector3(1, 0, 1)
-			};
 			CreateImage();
 		}
 		
@@ -84,7 +62,7 @@ namespace CompGraphLab1
 						throw new ArgumentOutOfRangeException();
 				}
 				Vector3 eulerAngles = new Vector3(AngleRotation[0], AngleRotation[1], AngleRotation[2]);
-				foreach (var _mesh in new MeshTransform[] { mesh, mesh1, mesh2 })
+				foreach (var _mesh in meshs)
 					_mesh.localRotation = eulerAngles;
 				CreateImage();
 				Invalidate();
@@ -96,12 +74,81 @@ namespace CompGraphLab1
 		}
 
         DirectionalLight light = new DirectionalLight() { localRotation = new Vector3(-60, 180, 0) };
-		Bitmap img = new Bitmap(1000, 1000);
+
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+			OpenFileDialog ofd = new OpenFileDialog();
+			ofd.InitialDirectory = "c:\\";
+			ofd.Filter = "obj files (*.obj)|*.obj";
+			ofd.FilterIndex = 2;
+			ofd.RestoreDirectory = true;
+			if (ofd.ShowDialog() == DialogResult.OK)
+			{
+				var filePath = ofd.FileName;
+				try
+                {
+					var loadObjData = loader.LoadFile(filePath);
+					meshs.Add(new MeshTransform()
+					{
+						localPosition = Vector3.Forward * 5,
+						localScale = Vector3.One,
+						localRotation = Vector3.Up * 30,
+						objData = loadObjData,
+						// baseColor = new Vector3(1, 0, 0) ???
+					});
+					CreateImage();
+					Invalidate();
+				}
+				catch (Exception)
+                {
+					MessageBox.Show(@"Something went wrong! Try again", @"Error");
+				}
+			}
+		}
+
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+			meshs.Clear();
+			CreateImage();
+			Invalidate();
+		}
+
+        private void toolStripButton3_Click(object sender, EventArgs e)
+        {
+			meshs.Add(new MeshTransform()
+			{
+				localPosition = Vector3.Forward * 5,
+				localScale = Vector3.One,
+				localRotation = Vector3.Up * 30,
+				objData = loader.LoadFile(@"..\..\..\Sources\amogus.obj"),
+				baseColor = new Vector3(1, 0, 0)
+			});
+			meshs.Add(new MeshTransform()
+			{
+				localPosition = Vector3.Forward * 5,
+				localScale = Vector3.One,
+				localRotation = Vector3.Up * 30,
+				objData = loader.LoadFile(@"..\..\..\Sources\amogus_visor.obj"),
+				baseColor = new Vector3(0, 0, 1)
+			});
+			meshs.Add(new MeshTransform()
+			{
+				localPosition = Vector3.Forward * 5,
+				localScale = Vector3.One,
+				localRotation = Vector3.Up * 30,
+				objData = loader.LoadFile(@"..\..\..\Sources\Letters.obj"),
+				baseColor = new Vector3(1, 0, 1)
+			});
+			CreateImage();
+			Invalidate();
+		}
+
+        Bitmap img = new Bitmap(1000, 1000);
 
 		private void CreateImage()
         {
 			var render = new Color[xSz, ySz];
-			var zb = zbb.RenderZBufferFillPoly(new Vector2Int(xSz, ySz), new List<MeshTransform>() { mesh, mesh1, mesh2 }, cam,
+			var zb = zbb.RenderZBufferFillPoly(new Vector2Int(xSz, ySz), meshs, cam,
 				(msh, tri) => SimpleLightShader.GetTriangleColor(msh, tri, light), render);
 			for (int x = 0; x < zb.GetLength(0); x++)
 				for (int y = 0; y < zb.GetLength(1); y++)
@@ -121,15 +168,16 @@ namespace CompGraphLab1
 		private void Form1_Paint(object sender, PaintEventArgs e)
 		{
 			e.Graphics.DrawImage(img, 0, 0);
-			
 		}
 
-		private void DrawWireframeNative(PaintEventArgs e)
+		private void DrawWireframeObjectNative(MeshTransform mesh, PaintEventArgs e)
 		{
-			var planar = new MeshProjector().Project(mesh.DataToWorldSpace(), cam);
+			var meshProj = new MeshProjector();
+			meshProj.InitCameraState(cam);
+			var planar = meshProj.Project(mesh.DataToWorldSpace());
 			foreach (var tri in planar.tris)
 			{
-				e.Graphics.DrawLine(new Pen(Color.Blue), (int)(tri.verts[0].x*600), (int)(tri.verts[0].y * 600), 
+				e.Graphics.DrawLine(new Pen(Color.Blue), (int)(tri.verts[0].x * 600), (int)(tri.verts[0].y * 600),
 					(int)(tri.verts[1].x * 600), (int)(tri.verts[1].y * 600));
 				e.Graphics.DrawLine(new Pen(Color.Blue), (int)(tri.verts[2].x * 600), (int)(tri.verts[2].y * 600),
 					(int)(tri.verts[1].x * 600), (int)(tri.verts[1].y * 600));
@@ -137,5 +185,6 @@ namespace CompGraphLab1
 					(int)(tri.verts[0].x * 600), (int)(tri.verts[0].y * 600));
 			}
 		}
+
 	}
 }
