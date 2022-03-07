@@ -108,9 +108,9 @@ namespace CompGraphLab1
 			// 
 			this.toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
 			this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton1,
-            this.toolStripButton2,
-            this.toolStripButton3});
+			this.toolStripButton1,
+			this.toolStripButton2,
+			this.toolStripButton3});
 			this.toolStrip1.Location = new System.Drawing.Point(0, 0);
 			this.toolStrip1.Name = "toolStrip1";
 			this.toolStrip1.Size = new System.Drawing.Size(582, 27);
@@ -171,17 +171,16 @@ namespace CompGraphLab1
 		}
 
 		#endregion
-        private System.Windows.Forms.Button RedrawButton;
-        private System.Windows.Forms.Label OXLabel;
-        private System.Windows.Forms.TextBox OXAngleRotationTextBox;
-        private System.Windows.Forms.Label OYLabel;
-        private System.Windows.Forms.TextBox OYAngleRotationTextBox;
-        private System.Windows.Forms.Label OZLabel;
-        private System.Windows.Forms.TextBox OZAngleRotationTextBox;
-        private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripButton toolStripButton1;
-        private System.Windows.Forms.ToolStripButton toolStripButton2;
-        private System.Windows.Forms.ToolStripButton toolStripButton3;
-    }
+		private System.Windows.Forms.Button RedrawButton;
+		private System.Windows.Forms.Label OXLabel;
+		private System.Windows.Forms.TextBox OXAngleRotationTextBox;
+		private System.Windows.Forms.Label OYLabel;
+		private System.Windows.Forms.TextBox OYAngleRotationTextBox;
+		private System.Windows.Forms.Label OZLabel;
+		private System.Windows.Forms.TextBox OZAngleRotationTextBox;
+		private System.Windows.Forms.ToolStrip toolStrip1;
+		private System.Windows.Forms.ToolStripButton toolStripButton1;
+		private System.Windows.Forms.ToolStripButton toolStripButton2;
+		private System.Windows.Forms.ToolStripButton toolStripButton3;
+	}
 }
-

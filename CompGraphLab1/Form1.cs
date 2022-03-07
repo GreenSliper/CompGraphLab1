@@ -28,25 +28,27 @@ namespace CompGraphLab1
 			InitializeComponent();
 			player.SoundLocation = @"..\..\..\Sources\sus.wav";
 			player.PlayLooping();
-			cam = new Camera() { 
+			cam = new Camera()
+			{
 				localPosition = Vector3.Zero,
 				horizontalAngle = 60,
 				verticalAngle = 60,
-				renderPlaneDistance = .1f };
+				renderPlaneDistance = .1f
+			};
 			CreateImage();
 		}
-		
+
 		private Color Lerp(Color c1, Color c2, float t)
 		{
-			return Color.FromArgb(c1.R + (int)MathF.Round((c2.R - c1.R) * t), 
-				c1.G + (int)MathF.Round((c2.G - c1.G) * t), 
+			return Color.FromArgb(c1.R + (int)MathF.Round((c2.R - c1.R) * t),
+				c1.G + (int)MathF.Round((c2.G - c1.G) * t),
 				c1.B + (int)MathF.Round((c2.B - c1.B) * t));
 		}
 
 		int xSz = 1000, ySz = 1000;
 
-        private void button1_Click(object sender, EventArgs e)
-        {
+		private void button1_Click(object sender, EventArgs e)
+		{
 			string[] AngleRotationStr = new string[] {
 				OXAngleRotationTextBox.Text,
 				OYAngleRotationTextBox.Text,
@@ -56,7 +58,7 @@ namespace CompGraphLab1
 			{
 				int[] AngleRotation = new int[AngleRotationStr.GetLength(0)];
 				for (int i = 0; i < AngleRotation.GetLength(0); ++i)
-                {
+				{
 					AngleRotation[i] = Int32.Parse(AngleRotationStr[i]);
 					if (Math.Abs(AngleRotation[i]) > 180)
 						throw new ArgumentOutOfRangeException();
@@ -73,10 +75,10 @@ namespace CompGraphLab1
 			}
 		}
 
-        DirectionalLight light = new DirectionalLight() { localRotation = new Vector3(-60, 180, 0) };
+		DirectionalLight light = new DirectionalLight() { localRotation = new Vector3(-60, 180, 0) };
 
-        private void toolStripButton1_Click(object sender, EventArgs e)
-        {
+		private void toolStripButton1_Click(object sender, EventArgs e)
+		{
 			OpenFileDialog ofd = new OpenFileDialog();
 			ofd.InitialDirectory = "c:\\";
 			ofd.Filter = "obj files (*.obj)|*.obj";
@@ -86,7 +88,7 @@ namespace CompGraphLab1
 			{
 				var filePath = ofd.FileName;
 				try
-                {
+				{
 					var loadObjData = loader.LoadFile(filePath);
 					meshs.Add(new MeshTransform()
 					{
@@ -100,21 +102,21 @@ namespace CompGraphLab1
 					Invalidate();
 				}
 				catch (Exception)
-                {
+				{
 					MessageBox.Show(@"Something went wrong! Try again", @"Error");
 				}
 			}
 		}
 
-        private void toolStripButton2_Click(object sender, EventArgs e)
-        {
+		private void toolStripButton2_Click(object sender, EventArgs e)
+		{
 			meshs.Clear();
 			CreateImage();
 			Invalidate();
 		}
 
-        private void toolStripButton3_Click(object sender, EventArgs e)
-        {
+		private void toolStripButton3_Click(object sender, EventArgs e)
+		{
 			meshs.Add(new MeshTransform()
 			{
 				localPosition = Vector3.Forward * 5,
@@ -143,10 +145,10 @@ namespace CompGraphLab1
 			Invalidate();
 		}
 
-        Bitmap img = new Bitmap(1000, 1000);
+		Bitmap img = new Bitmap(1000, 1000);
 
 		private void CreateImage()
-        {
+		{
 			var render = new Color[xSz, ySz];
 			var zb = zbb.RenderZBufferFillPoly(new Vector2Int(xSz, ySz), meshs, cam,
 				(msh, tri) => SimpleLightShader.GetTriangleColor(msh, tri, light), render);
