@@ -29,5 +29,10 @@ namespace CompGraphLab1
 		{
 			return new Vector2(first.x - second.x, first.y - second.y);
 		}
+
+		public static Vector2 operator *(float magnitude, Vector2 vector)
+		{
+			return new Vector2(vector.x * magnitude, vector.y * magnitude);
+		}
 	}
 }
