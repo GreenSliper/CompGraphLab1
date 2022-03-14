@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CompGraphLab1.Utility
 {
-    class BezierCurve
+    public class BezierCurve
     {
         public bool is_points_visable;
         public Color curve_color;

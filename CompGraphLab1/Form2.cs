@@ -13,7 +13,6 @@ namespace CompGraphLab1
     public partial class Form2 : Form
     {
         BezierCurveDrawer drawer;
-
         public Form2()
         {
             InitializeComponent();
@@ -23,14 +22,14 @@ namespace CompGraphLab1
                 {
                     ref_points_color = Color.Blue,
                     curve_color = Color.Red,
-                    points = new List<Vector2> {
+                    points = {
                         new Vector2(9 + 50, 827 - 200),
                         new Vector2(9 + 150, 827 - 100),
                         new Vector2(9 + 250, 827 - 250),
                         new Vector2(9 + 200, 827 - 50),
                     }
                 },
-                /*new BezierCurve()
+                new BezierCurve()
                 {
                     is_points_visable = false,
                     //ref_points_color = Color.Blue,
@@ -79,9 +78,22 @@ namespace CompGraphLab1
                         new Vector2(9 + 400, 827 - 250),
                         new Vector2(9 + 400, 827 - 320)
                     }
-                }*/
+                }
 
             };
+            for (int i = 1; i < drawer.curves.Count + 1; i++)
+            {
+                listBox1.Items.Insert(i-1, "Кривая " + i);
+            }
+            pictureBox1.Image = drawer.Draw();
+        }
+           
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Form3 form3 = new Form3(drawer.curves[listBox1.SelectedIndex].curve_color, drawer.curves[listBox1.SelectedIndex].ref_points_color, drawer.curves[listBox1.SelectedIndex].points, listBox1.SelectedIndex);
+            form3.ShowDialog();
+            drawer.curves[listBox1.SelectedIndex].curve_color = form3.curve_color;
+            drawer.curves[listBox1.SelectedIndex].ref_points_color = form3.ref_points_color;
             pictureBox1.Image = drawer.Draw();
         }
     }
