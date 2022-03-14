@@ -15,7 +15,7 @@ namespace CompGraphLab1.Data
         public BezierCurveDrawer()
         {
             curves = new List<BezierCurve>();
-            orig_img = new Bitmap(@"C:\Users\Jesus\Pictures\baxies.bmp");
+            orig_img = new Bitmap(@"..\..\..\Sources\axies.bmp");
         }
 
         public Bitmap Draw()
