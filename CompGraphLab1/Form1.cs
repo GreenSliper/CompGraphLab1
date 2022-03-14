@@ -46,7 +46,8 @@ namespace CompGraphLab1
 						localScale = Vector3.One,
 						localRotation = Vector3.Forward * 90,
 						triangleShader = Shaders.UnlitColor,
-						objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
+						//objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
+						objData = new Data.ObjData(),
 						baseColor = new Vector3(1, 0, 0)
 					},
 					//y
@@ -56,7 +57,8 @@ namespace CompGraphLab1
 						localScale = Vector3.One,
 						localRotation = Vector3.Right*180,
 						triangleShader = Shaders.UnlitColor,
-						objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
+						//objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
+						objData = new Data.ObjData(),
 						baseColor = new Vector3(0, 1, 0)
 					},
 					//z
@@ -66,7 +68,8 @@ namespace CompGraphLab1
 						localScale = Vector3.One,
 						localRotation = Vector3.Right*270,
 						triangleShader = Shaders.UnlitColor,
-						objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
+						//objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
+						objData = new Data.ObjData(),
 						baseColor = new Vector3(0, 0, 1)
 					}
 				};
@@ -207,7 +210,13 @@ namespace CompGraphLab1
 			e.Graphics.DrawImage(img, 0, 0);
 		}
 
-		private void DrawWireframeObjectNative(MeshTransform mesh, PaintEventArgs e)
+        private void toolStripButton4_Click(object sender, EventArgs e)
+        {
+			Form2 form2 = new Form2();
+			form2.ShowDialog();
+        }
+
+        private void DrawWireframeObjectNative(MeshTransform mesh, PaintEventArgs e)
 		{
 			var meshProj = new MeshProjector();
 			meshProj.InitCameraState(cam);
