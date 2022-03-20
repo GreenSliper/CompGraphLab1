@@ -14,9 +14,11 @@ namespace CompGraphLab1
     public partial class Form2 : Form
     {
         BezierCurveDrawer drawer;
+        private int counter;
         public Form2()
         {
             InitializeComponent();
+            counter = 0;
             drawer = new BezierCurveDrawer();
             drawer.curves = new List<BezierCurve>();
             Draw();
@@ -30,7 +32,7 @@ namespace CompGraphLab1
         private void button1_Click(object sender, EventArgs e)
         {
             Random rndm = new Random();
-            listBox1.Items.Insert(drawer.curves.Count, "Кривая " + (drawer.curves.Count + 1));
+            listBox1.Items.Insert(drawer.curves.Count, "Кривая " + (++counter));
             drawer.curves.Add(new BezierCurve(){
                 points = new List<Vector2> {
                     new Vector2(9 + rndm.Next(201) * 2, 827 - rndm.Next(201) * 2),
@@ -70,7 +72,7 @@ namespace CompGraphLab1
         private void button1_Click_1(object sender, EventArgs e)
         {
             for (int i = drawer.curves.Count; i < drawer.curves.Count + 4; ++i)
-                listBox1.Items.Insert(i, "Кривая " + (i + 1));
+                listBox1.Items.Insert(i, "Кривая " + (++counter));
             drawer.curves.Add(
                 new BezierCurve()
                 {
