@@ -11,10 +11,12 @@ namespace CompGraphLab1
 {
     public partial class Form3 : Form
     {
+        Form2 form2;
         public BezierCurve curve;
         private Vector2 center_in_pixels;
-        public Form3(BezierCurve curve, int number)
+        public Form3(BezierCurve curve, int number, Form2 form2)
         {
+            this.form2 = form2;
             this.curve = curve;
             center_in_pixels = new Vector2(9, 827);
             InitializeComponent();
@@ -52,6 +54,7 @@ namespace CompGraphLab1
             if (listBox1.SelectedIndex == 3)
                 curve.curve_color = Color.Orange;
             label2.Text = curve.curve_color.ToString();
+            form2.Draw();
         }
 
         private void listBox2_SelectedIndexChanged(object sender, EventArgs e)
@@ -65,6 +68,7 @@ namespace CompGraphLab1
             if (listBox2.SelectedIndex == 3)
                 curve.ref_points_color = Color.Orange;
             label6.Text = curve.ref_points_color.ToString();
+            form2.Draw();
         }
 
         private void listBox3_SelectedIndexChanged(object sender, EventArgs e)
@@ -125,6 +129,7 @@ namespace CompGraphLab1
                     listBox3.Items.RemoveAt(listBox3.SelectedIndex);
                     listBox3.Items.Insert(temp, "Точка " + (temp + 1) + ": " + _point.x + ";" + _point.y);
                     textBox1.ResetText();
+                    form2.Draw();
                 }
                 catch (Exception)
                 {
@@ -143,6 +148,7 @@ namespace CompGraphLab1
             curve.points.Add(new Vector2(center_in_pixels.x, center_in_pixels.y));
             listBox3.Items.Insert(curve.points.Count - 1, "Точка " + curve.points.Count + ": " + 0 + ";" + 0);
             listBox3.SetSelected(curve.points.Count - 1, true);
+            form2.Draw();
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -152,6 +158,7 @@ namespace CompGraphLab1
                 int pos = listBox3.SelectedIndex;
                 listBox3.Items.RemoveAt(pos);
                 curve.points.RemoveAt(pos);
+                form2.Draw();
             }
         }
 
@@ -159,6 +166,7 @@ namespace CompGraphLab1
         {
             curve.is_points_visable = !curve.is_points_visable;
             visiableChangeButton.Text = (curve.is_points_visable) ? "Сделать невидимыми" : "Сделать видимыми";
+            form2.Draw();
         }
     }
 }

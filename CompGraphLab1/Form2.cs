@@ -19,6 +19,11 @@ namespace CompGraphLab1
             InitializeComponent();
             drawer = new BezierCurveDrawer();
             drawer.curves = new List<BezierCurve>();
+            Draw();
+        }
+
+        public void Draw()
+        {
             pictureBox1.Image = drawer.Draw();
         }
 
@@ -32,7 +37,7 @@ namespace CompGraphLab1
                     new Vector2(9 + rndm.Next(201) * 2, 827 - rndm.Next(201) * 2)
                 }
             });
-            pictureBox1.Image = drawer.Draw();
+            Draw();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -40,7 +45,7 @@ namespace CompGraphLab1
             if (listBox1.SelectedIndex >= 0)
             {
                 DeleteCurve(listBox1.SelectedIndex);
-                pictureBox1.Image = drawer.Draw();
+                Draw();
             }
         }
 
@@ -54,7 +59,7 @@ namespace CompGraphLab1
         {
             if (listBox1.SelectedIndex >= 0)
             {
-                Form3 form3 = new Form3(drawer.curves[listBox1.SelectedIndex], listBox1.SelectedIndex);
+                Form3 form3 = new Form3(drawer.curves[listBox1.SelectedIndex], listBox1.SelectedIndex, this);
                 form3.ShowDialog();
                 if (drawer.curves[listBox1.SelectedIndex].points.Count() == 0)
                     DeleteCurve(listBox1.SelectedIndex);

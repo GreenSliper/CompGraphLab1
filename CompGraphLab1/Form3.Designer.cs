@@ -42,7 +42,6 @@ namespace CompGraphLab1
             this.label8 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
             this.label9 = new System.Windows.Forms.Label();
             this.addButton = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
@@ -173,17 +172,6 @@ namespace CompGraphLab1
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(152, 491);
-            this.button2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(183, 31);
-            this.button2.TabIndex = 14;
-            this.button2.Text = "Применить изменения";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
             // label9
             // 
             this.label9.AutoSize = true;
@@ -227,12 +215,11 @@ namespace CompGraphLab1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(560, 600);
+            this.ClientSize = new System.Drawing.Size(560, 499);
             this.Controls.Add(this.visiableChangeButton);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.addButton);
             this.Controls.Add(this.label9);
-            this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label8);
@@ -269,7 +256,6 @@ namespace CompGraphLab1
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Button addButton;
         private System.Windows.Forms.Button button4;
