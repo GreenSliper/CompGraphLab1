@@ -11,31 +11,21 @@ namespace CompGraphLab1
 {
     public partial class Form3 : Form
     {
-        List<Vector2> points;
-        public Color curve_color;
-        public Color ref_points_color;
-        public Form3(Color curve_color, Color ref_points_color, List<Vector2> points, int number)
+        public BezierCurve curve;
+        private Vector2 center_in_pixels;
+        public Form3(BezierCurve curve, int number)
         {
-            this.curve_color = curve_color;
-            this.ref_points_color = ref_points_color;
-            this.points = points;
+            this.curve = curve;
+            center_in_pixels = new Vector2(9, 827);
             InitializeComponent();
-            label1.Text = "Текущий цвет: ";
-            label2.Text = this.curve_color.ToString();
+            label2.Text = curve.curve_color.ToString();
             {
                 listBox1.Items.Insert(0, Color.Red);
                 listBox1.Items.Insert(1, Color.Green);
                 listBox1.Items.Insert(2, Color.Blue);
                 listBox1.Items.Insert(3, Color.Orange);
             }
-            label3.Text = "Цвет кривой";
-            label4.Text = "Цвет точек кривой";
-            label5.Text = label1.Text;
-            label6.Text = this.ref_points_color.ToString();
-            label7.Text = "Координаты точек кривой";
-            label8.Text = "Изменение точек кривой";
-            button1.Text = "Изменить точку";
-            button2.Text = "Применить изменения";
+            label6.Text = curve.ref_points_color.ToString();
             label9.Text = "Кривая " + (number + 1);
             {
                 listBox2.Items.Insert(0, Color.Red);
@@ -43,58 +33,46 @@ namespace CompGraphLab1
                 listBox2.Items.Insert(2, Color.Blue);
                 listBox2.Items.Insert(3, Color.Orange);
             }
-            for (int i = 1; i < points.Count + 1; i++)
+            visiableChangeButton.Text = (curve.is_points_visable) ? "Сделать невидимыми" : "Сделать видимыми";
+            for (int i = 1; i < curve.points.Count + 1; i++)
             {
-                listBox3.Items.Insert(i - 1, "Точка " + i + ": " + points[i - 1].x + ";" + points[i - 1].y);
+                Vector2 _point = PixelToReal(curve.points[i - 1]);
+                listBox3.Items.Insert(i - 1, "Точка " + i + ": " + _point.x + ";" + _point.y);
             }
         }
-
-        private void Form3_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click(object sender, EventArgs e) { }
-        private void label2_Click(object sender, EventArgs e) { }
-        private void label3_Click(object sender, EventArgs e) { }
-        private void label4_Click(object sender, EventArgs e) { }
-        private void label5_Click(object sender, EventArgs e) { }
-        private void label6_Click(object sender, EventArgs e) { }
-        private void label7_Click(object sender, EventArgs e) { }
-        private void label8_Click(object sender, EventArgs e) { }
-        private void label9_Click(object sender, EventArgs e) { }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listBox1.SelectedIndex == 0)
-                this.curve_color = Color.Red;
+                curve.curve_color = Color.Red;
             if (listBox1.SelectedIndex == 1)
-                this.curve_color = Color.Green;
+                curve.curve_color = Color.Green;
             if (listBox1.SelectedIndex == 2)
-                this.curve_color = Color.Blue;
+                curve.curve_color = Color.Blue;
             if (listBox1.SelectedIndex == 3)
-                this.curve_color = Color.Orange;
-            label2.Text = this.curve_color.ToString();
+                curve.curve_color = Color.Orange;
+            label2.Text = curve.curve_color.ToString();
         }
 
         private void listBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listBox2.SelectedIndex == 0)
-                this.ref_points_color = Color.Red;
+                curve.ref_points_color = Color.Red;
             if (listBox2.SelectedIndex == 1)
-                this.ref_points_color = Color.Green;
+                curve.ref_points_color = Color.Green;
             if (listBox2.SelectedIndex == 2)
-                this.ref_points_color = Color.Blue;
+                curve.ref_points_color = Color.Blue;
             if (listBox2.SelectedIndex == 3)
-                this.ref_points_color = Color.Orange;
-            label6.Text = this.ref_points_color.ToString();
+                curve.ref_points_color = Color.Orange;
+            label6.Text = curve.ref_points_color.ToString();
         }
 
         private void listBox3_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (listBox3.SelectedIndex > 0)
+            if (listBox3.SelectedIndex >= 0)
             {
-                textBox1.Text = points[listBox3.SelectedIndex].x + ";" + points[listBox3.SelectedIndex].y;
+                Vector2 _point = PixelToReal(curve.points[listBox3.SelectedIndex]);
+                textBox1.Text = _point.x + ";" + _point.y;
             }
         }
 
@@ -116,25 +94,71 @@ namespace CompGraphLab1
             }
             vec.x = Int32.Parse(firstPart);
             vec.y = Int32.Parse(secondPart);
-            return vec;
+            if (vec.x > 400 || vec.x < 0 || vec.y > 400 || vec.y < 0)
+                throw new ArgumentOutOfRangeException();
+            return RealToPixel(vec); ;
         }
-        private void textBox1_TextChanged(object sender, EventArgs e) {}
+
+        public Vector2 RealToPixel(Vector2 point)
+        {
+            return new Vector2(
+                center_in_pixels.x + 2 * point.x,
+                center_in_pixels.y - 2 * point.y);
+        }
+
+        public Vector2 PixelToReal(Vector2 point)
+        {
+            return new Vector2(
+                (point.x - center_in_pixels.x) / 2,
+                (center_in_pixels.y - point.y) / 2);
+        }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (listBox3.SelectedIndex > 0)
+            if (listBox3.SelectedIndex >= 0)
             {
-                int temp = listBox3.SelectedIndex;
-                points[temp] = getPoint(textBox1.Text);
-                listBox3.Items.RemoveAt(listBox3.SelectedIndex);
-                listBox3.Items.Insert(temp, "Точка " + (temp + 1) + ": " + points[temp].x + ";" + points[temp].y);
-                textBox1.ResetText();
+                try
+                {
+                    int temp = listBox3.SelectedIndex;
+                    curve.points[temp] = getPoint(textBox1.Text);
+                    Vector2 _point = PixelToReal(curve.points[temp]);
+                    listBox3.Items.RemoveAt(listBox3.SelectedIndex);
+                    listBox3.Items.Insert(temp, "Точка " + (temp + 1) + ": " + _point.x + ";" + _point.y);
+                    textBox1.ResetText();
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show(@"You have entered incorrect data", @"Error");
+                }
             }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            curve.points.Add(new Vector2(center_in_pixels.x, center_in_pixels.y));
+            listBox3.Items.Insert(curve.points.Count - 1, "Точка " + curve.points.Count + ": " + 0 + ";" + 0);
+            listBox3.SetSelected(curve.points.Count - 1, true);
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (listBox3.SelectedIndex >= 0)
+            {
+                int pos = listBox3.SelectedIndex;
+                listBox3.Items.RemoveAt(pos);
+                curve.points.RemoveAt(pos);
+            }
+        }
+
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+            curve.is_points_visable = !curve.is_points_visable;
+            visiableChangeButton.Text = (curve.is_points_visable) ? "Сделать невидимыми" : "Сделать видимыми";
         }
     }
 }
