@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CompGraphLab1.Utility
 {
-    class BezierCurve
+    public class BezierCurve
     {
         public bool is_points_visable;
         public Color curve_color;
@@ -16,8 +16,8 @@ namespace CompGraphLab1.Utility
         {
             Random rndm = new Random();
             is_points_visable = true;
-            curve_color = Color.FromArgb(rndm.Next(256), rndm.Next(256), rndm.Next(256));
-            ref_points_color = Color.FromArgb(rndm.Next(256), rndm.Next(256), rndm.Next(256));
+            curve_color = Color.Red;
+            ref_points_color = Color.Blue;
             points = new List<Vector2>();
         }
     }
