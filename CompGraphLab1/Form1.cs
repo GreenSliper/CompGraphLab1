@@ -1,10 +1,12 @@
 ﻿using CompGraphLab1.Load;
 using CompGraphLab1.Rendering;
 using CompGraphLab1.Scene;
+using CompGraphLab1.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -18,21 +20,23 @@ namespace CompGraphLab1
 	{
 		System.Media.SoundPlayer player = new System.Media.SoundPlayer();
 		Camera cam;
-		//IMeshProjector meshProjector = new MeshProjector();
 		Renderer zbb = new Renderer();
 		IObjLoader loader = new ObjLoader();
 		List<MeshTransform> meshes = new List<MeshTransform>();
 		MeshTransform[] axises;
-		//MeshTransform mesh, mesh1, mesh2;
+		BezierSurfaceData bezierSurfaceData;
+		bool bezierSurfaceMode;
+
 		public Form1()
 		{
 			InitializeComponent();
+			this.KeyPreview = true;
 			player.SoundLocation = @"..\..\..\Sources\sus.wav";
-			player.PlayLooping();
+			//player.PlayLooping();
 			cam = new Camera()
 			{
-				localPosition = Vector3.Right*2,
-				localRotation = Vector3.Up*-30,
+				localPosition = Vector3.Right*0,
+				localRotation = Vector3.Up*0,
 				horizontalAngle = 60,
 				verticalAngle = 60,
 				renderPlaneDistance = .1f
@@ -46,8 +50,7 @@ namespace CompGraphLab1
 						localScale = Vector3.One,
 						localRotation = Vector3.Forward * 90,
 						triangleShader = Shaders.UnlitColor,
-						//objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
-						objData = new Data.ObjData(),
+						objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
 						baseColor = new Vector3(1, 0, 0)
 					},
 					//y
@@ -57,8 +60,7 @@ namespace CompGraphLab1
 						localScale = Vector3.One,
 						localRotation = Vector3.Right*180,
 						triangleShader = Shaders.UnlitColor,
-						//objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
-						objData = new Data.ObjData(),
+						objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
 						baseColor = new Vector3(0, 1, 0)
 					},
 					//z
@@ -68,11 +70,18 @@ namespace CompGraphLab1
 						localScale = Vector3.One,
 						localRotation = Vector3.Right*270,
 						triangleShader = Shaders.UnlitColor,
-						//objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
-						objData = new Data.ObjData(),
+						objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
 						baseColor = new Vector3(0, 0, 1)
 					}
 				};
+			bezierSurfaceMode = false;
+			bezierSurfaceData = new BezierSurfaceData();
+			Random rand = new Random();
+			for (int i = 0; i < 16; ++i)
+				bezierSurfaceData.controlPoints[i] =
+					new Vector3(rand.Next(-30, 30) / 10f, rand.Next(-10, 30) / 10f, rand.Next(-15, 25) / 10f);
+			BezierSurfaceObjCreator.Create(bezierSurfaceData);
+
 			CreateImage();
 		}
 
@@ -102,8 +111,11 @@ namespace CompGraphLab1
 						throw new ArgumentOutOfRangeException();
 				}
 				Vector3 eulerAngles = new Vector3(AngleRotation[0], AngleRotation[1], AngleRotation[2]);
-				foreach (var _mesh in meshes)
-					_mesh.localRotation = eulerAngles;
+				if (!bezierSurfaceMode)
+					foreach (var _mesh in meshes)
+						_mesh.localRotation = eulerAngles;
+				else
+					bezierSurfaceData.mesh.localRotation = eulerAngles;
 				CreateImage();
 				Invalidate();
 			}
@@ -132,7 +144,7 @@ namespace CompGraphLab1
 					{
 						localPosition = Vector3.Forward * 5,
 						localScale = Vector3.One,
-						localRotation = Vector3.Up * 30,
+						localRotation = Vector3.Zero,
 						objData = loadObjData,
 						// baseColor = new Vector3(1, 0, 0) ???
 					});
@@ -163,23 +175,23 @@ namespace CompGraphLab1
 				objData = loader.LoadFile(@"..\..\..\Sources\amogus.obj"),
 				baseColor = new Vector3(1, 0, 0)
 			});
-			meshes.Add(new MeshTransform()
-			{
-				localPosition = Vector3.Forward * 5,
-				localScale = Vector3.One,
-				localRotation = Vector3.Zero,
-				objData = loader.LoadFile(@"..\..\..\Sources\amogus_visor.obj"),
-				baseColor = new Vector3(0, 0, 1)
-			});
-			meshes.Add(new MeshTransform()
-			{
-				localPosition = Vector3.Forward * 5,
-				localScale = Vector3.One,
-				localRotation = Vector3.Zero,
-				objData = loader.LoadFile(@"..\..\..\Sources\Letters.obj"),
-				baseColor = new Vector3(1, 0, 1)
-			});
-			CreateImage();
+            meshes.Add(new MeshTransform()
+            {
+                localPosition = Vector3.Forward * 5,
+                localScale = Vector3.One,
+                localRotation = Vector3.Zero,
+                objData = loader.LoadFile(@"..\..\..\Sources\amogus_visor.obj"),
+                baseColor = new Vector3(0, 0, 1)
+            });
+            meshes.Add(new MeshTransform()
+            {
+                localPosition = Vector3.Forward * 5,
+                localScale = Vector3.One,
+                localRotation = Vector3.Zero,
+                objData = loader.LoadFile(@"..\..\..\Sources\Letters.obj"),
+                baseColor = new Vector3(1, 0, 1)
+            });
+            CreateImage();
 			Invalidate();
 		}
 
@@ -187,9 +199,14 @@ namespace CompGraphLab1
 
 		private void CreateImage()
 		{
+			Stopwatch stopwatch = new Stopwatch();
+			stopwatch.Start();
 			var render = new Color[xSz, ySz];
-			var zb = zbb.RenderZBufferFillPoly(new Vector2Int(xSz, ySz), meshes.Concat(axises),
-				light, cam, render);
+			float[,] zb = null;
+			if (!bezierSurfaceMode)
+				zb = zbb.RenderZBufferFillPoly(new Vector2Int(xSz, ySz), meshes.Concat(axises), light, cam, render);
+			else
+				zb = zbb.BezierSurfaceRenderZBufferFillPoly(new Vector2Int(xSz, ySz), bezierSurfaceData, axises, light, cam, render);
 			for (int x = 0; x < zb.GetLength(0); x++)
 				for (int y = 0; y < zb.GetLength(1); y++)
 				{
@@ -203,6 +220,8 @@ namespace CompGraphLab1
 					else
 						img.SetPixel(x, y, Color.Black);
 				}
+			stopwatch.Stop();
+			var time = stopwatch.ElapsedMilliseconds;
 		}
 
 		private void Form1_Paint(object sender, PaintEventArgs e)
@@ -215,6 +234,25 @@ namespace CompGraphLab1
 			Form2 form2 = new Form2();
 			form2.ShowDialog();
         }
+
+        private void controlPointsStripButton_Click(object sender, EventArgs e)
+        {
+			BezierSurfaceManagerForm form = new BezierSurfaceManagerForm(bezierSurfaceData);
+			form.ShowDialog();
+			CreateImage();
+			Invalidate();
+		}
+
+        private void changeInterfaceStripButton_Click(object sender, EventArgs e)
+        {
+			toolStripButton1.Visible = !toolStripButton1.Visible;
+			toolStripButton2.Visible = !toolStripButton2.Visible;
+			toolStripButton3.Visible = !toolStripButton3.Visible;
+			controlPointsStripButton.Visible = !controlPointsStripButton.Visible;
+			bezierSurfaceMode = !bezierSurfaceMode;
+			CreateImage();
+			Invalidate();
+		}
 
         private void DrawWireframeObjectNative(MeshTransform mesh, PaintEventArgs e)
 		{
@@ -232,5 +270,41 @@ namespace CompGraphLab1
 			}
 		}
 
+
+		private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+			if (meshes.Count() != 0)
+			{
+				switch (e.KeyCode)
+				{
+					case Keys.S:
+						meshes.Last().localPosition += Vector3.Forward;
+						e.Handled = true;
+						break;
+					case Keys.W:
+						meshes.Last().localPosition += Vector3.Backward;
+						e.Handled = true;
+						break;
+					case Keys.A:
+						meshes.Last().localPosition += Vector3.Left;
+						e.Handled = true;
+						break;
+					case Keys.D:
+						meshes.Last().localPosition += Vector3.Right;
+						e.Handled = true;
+						break;
+					case Keys.E:
+						meshes.Last().localPosition += Vector3.Up;
+						e.Handled = true;
+						break;
+					case Keys.Q:
+						meshes.Last().localPosition += Vector3.Down;
+						e.Handled = true;
+						break;
+				}
+				CreateImage();
+				Invalidate();
+			}
+		}
 	}
 }

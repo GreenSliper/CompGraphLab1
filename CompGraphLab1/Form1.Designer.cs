@@ -41,6 +41,8 @@ namespace CompGraphLab1
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
+            this.controlPointsStripButton = new System.Windows.Forms.ToolStripButton();
+            this.changeInterfaceStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -112,7 +114,9 @@ namespace CompGraphLab1
             this.toolStripButton1,
             this.toolStripButton2,
             this.toolStripButton3,
-            this.toolStripButton4});
+            this.toolStripButton4,
+            this.controlPointsStripButton,
+            this.changeInterfaceStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(582, 27);
@@ -159,6 +163,27 @@ namespace CompGraphLab1
             this.toolStripButton4.Text = "Bézier curve window";
             this.toolStripButton4.Click += new System.EventHandler(this.toolStripButton4_Click);
             // 
+            // controlPointsStripButton
+            // 
+            this.controlPointsStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.controlPointsStripButton.Image = global::CompGraphLab1.Properties.Resources.table_icon;
+            this.controlPointsStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.controlPointsStripButton.Name = "controlPointsStripButton";
+            this.controlPointsStripButton.Size = new System.Drawing.Size(29, 24);
+            this.controlPointsStripButton.Text = "Control points";
+            this.controlPointsStripButton.Visible = false;
+            this.controlPointsStripButton.Click += new System.EventHandler(this.controlPointsStripButton_Click);
+            // 
+            // changeInterfaceStripButton
+            // 
+            this.changeInterfaceStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.changeInterfaceStripButton.Image = global::CompGraphLab1.Properties.Resources.changeInterface;
+            this.changeInterfaceStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.changeInterfaceStripButton.Name = "changeInterfaceStripButton";
+            this.changeInterfaceStripButton.Size = new System.Drawing.Size(29, 24);
+            this.changeInterfaceStripButton.Text = "Change interface";
+            this.changeInterfaceStripButton.Click += new System.EventHandler(this.changeInterfaceStripButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
@@ -175,6 +200,7 @@ namespace CompGraphLab1
             this.Name = "Form1";
             this.Text = "Form1";
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -195,5 +221,7 @@ namespace CompGraphLab1
 		private System.Windows.Forms.ToolStripButton toolStripButton2;
 		private System.Windows.Forms.ToolStripButton toolStripButton3;
         private System.Windows.Forms.ToolStripButton toolStripButton4;
+        private System.Windows.Forms.ToolStripButton controlPointsStripButton;
+        private System.Windows.Forms.ToolStripButton changeInterfaceStripButton;
     }
 }

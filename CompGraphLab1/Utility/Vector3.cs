@@ -23,6 +23,11 @@ namespace CompGraphLab1
 			z = color.B;
 		}
 
+		public override string ToString()
+		{
+			return x.ToString() + ";" + y.ToString() + ";" + z.ToString();
+		}
+
 		public Color ToColor()
 		{
 			return Color.FromArgb((int)MathF.Round(x), (int)MathF.Round(y), (int)MathF.Round(z));

@@ -83,6 +83,16 @@ namespace CompGraphLab1.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap changeInterface {
+            get {
+                object obj = ResourceManager.GetObject("changeInterface", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap curve {
             get {
                 object obj = ResourceManager.GetObject("curve", resourceCulture);
@@ -106,6 +116,16 @@ namespace CompGraphLab1.Properties {
         internal static System.Drawing.Bitmap delete_icon1 {
             get {
                 object obj = ResourceManager.GetObject("delete_icon1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap table_icon {
+            get {
+                object obj = ResourceManager.GetObject("table_icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
