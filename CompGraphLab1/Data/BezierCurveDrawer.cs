@@ -23,9 +23,9 @@ namespace CompGraphLab1.Data
             Bitmap img = new Bitmap(orig_img);
             foreach (var curve in curves)
             {
-                if (curve.is_points_visable)
+                /*if (curve.is_points_visable)
                     for (int i = 0; i < curve.points.Count(); ++i)
-                        HighlightPoint(img, curve.points[i], curve.ref_points_color);
+                        HighlightPoint(img, curve.points[i], curve.ref_points_color);*/
                 for (float change = 0; change <= 1; change += 0.0001f)
                 {
                     List<Vector2> new_points = curve.points;
