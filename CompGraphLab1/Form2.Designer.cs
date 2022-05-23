@@ -98,6 +98,7 @@ namespace CompGraphLab1
             this.listBox2.Name = "listBox2";
             this.listBox2.Size = new System.Drawing.Size(120, 94);
             this.listBox2.TabIndex = 8;
+            this.listBox2.SelectedIndexChanged += new System.EventHandler(this.listBox2_SelectedIndexChanged);
             // 
             // button2
             // 

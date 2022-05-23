@@ -37,6 +37,60 @@ namespace CompGraphLab1.Data
             return img;
         }
 
+        public Bitmap DrawLines()
+        {
+            Bitmap img = new Bitmap(orig_img);
+            foreach (var curve in curves)
+            {
+                float x2 = curve.points.Last().x;
+                float x1 = curve.points.First().x;
+                float y2 = curve.points.Last().y;
+                float y1 = curve.points.First().y;
+
+                bool steep = MathF.Abs(y2 - y1) > MathF.Abs(x2 - x1);
+                if (steep)
+                {
+                    Swap(ref x1, ref y1);
+                    Swap(ref x2, ref y2);
+                }
+
+                if (x1 > x2)
+                {
+                    Swap(ref x1, ref x2);
+                    Swap(ref y1, ref y2);
+                }
+
+                float dx = x2 - x1;
+                float dy = MathF.Abs(y2 - y1);
+
+                float error = dx / 2.0f;
+                int ystep = (y1 < y2) ? 1 : -1;
+                int y = (int)y1;
+
+                int maxX = (int)x2;
+
+                for (int x = (int)x1; x <= maxX; x++)
+                {
+                    if (steep)
+                    {
+                        SetPoint(img, new Vector2(y, x), curve.curve_color);
+                    }
+                    else
+                    {
+                        SetPoint(img, new Vector2(x, y), curve.curve_color);
+                    }
+
+                    error -= dy;
+                    if (error < 0)
+                    {
+                        y += ystep;
+                        error += dx;
+                    }
+                }
+            }
+            return img;
+        }
+
         private static List<Vector2> GetNextListOfPoints(List<Vector2> points, float change)
         {
             List<Vector2> new_points = new List<Vector2>();
@@ -84,6 +138,14 @@ namespace CompGraphLab1.Data
             return new Vector2(
                 Math.Max(Math.Min(orig_img.Width, point.x), 0),
                 Math.Max(Math.Min(orig_img.Height, point.y), 0));
+        }
+
+        static void Swap<T>(ref T lhs, ref T rhs)
+        {
+            T temp;
+            temp = lhs;
+            lhs = rhs;
+            rhs = temp;
         }
     }
 }

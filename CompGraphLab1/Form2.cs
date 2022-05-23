@@ -16,30 +16,34 @@ namespace CompGraphLab1
         BezierCurveDrawer drawer;
         BezierCurveDrawer drawerForCurves;
         List<BezierCurveDrawer> drawerForRectangle;
+        List<int> intersectingLinesIndexes;
         private int counterCurve;
         private int counterRectangle;
         private bool reset = false;
+        private int lastSelectedRectangleIndex;
         public Form2()
         {
             InitializeComponent();
             counterCurve = 0;
             counterRectangle = 0;
+            lastSelectedRectangleIndex = 0;
             drawer = new BezierCurveDrawer();
             drawer.curves = new List<BezierCurve>();
             drawerForCurves = new BezierCurveDrawer();
             drawerForCurves.curves = new List<BezierCurve>();
             drawerForRectangle = new List<BezierCurveDrawer>();
+            intersectingLinesIndexes = new List<int>();
             Draw();
         }
 
         public void Draw()
         {
-            pictureBox1.Image = drawer.Draw();
+            pictureBox1.Image = drawer.DrawLines();
         }
         public void DrawCurve()
         {
             drawer.curves.Add(drawerForCurves.curves[counterCurve]);
-            pictureBox1.Image = drawer.Draw();
+            pictureBox1.Image = drawer.DrawLines();
         }
         public void DrawRectangle()
         {
@@ -47,7 +51,18 @@ namespace CompGraphLab1
             drawer.curves.Add(drawerForRectangle[counterRectangle].curves[1]);
             drawer.curves.Add(drawerForRectangle[counterRectangle].curves[2]);
             drawer.curves.Add(drawerForRectangle[counterRectangle].curves[3]);
-            pictureBox1.Image = drawer.Draw();
+            pictureBox1.Image = drawer.DrawLines();
+        }
+
+        private void listBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listBox2.SelectedIndex >= 0)
+            {
+                resetDrawer();
+                foreach (var line in drawerForRectangle[listBox2.SelectedIndex].curves)
+                    line.curve_color = Color.Maroon;
+                Draw();
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -62,7 +77,8 @@ namespace CompGraphLab1
                 points = new List<Vector2> {
                     new Vector2(9 + rndm.Next(402) * 2, 827 - rndm.Next(402) * 2),
                     new Vector2(9 + rndm.Next(402) * 2, 827 - rndm.Next(402) * 2)
-                }
+                },
+                curve_color = Color.Blue
             });
             DrawCurve();
             counterCurve++;
@@ -99,6 +115,7 @@ namespace CompGraphLab1
 
         private void DeleteRectangle(int index)
         {
+            lastSelectedRectangleIndex = -1;
             if (reset)
             {
                 resetDrawer();
@@ -123,16 +140,25 @@ namespace CompGraphLab1
                 form3.ShowDialog();
                 if (drawerForCurves.curves[listBox1.SelectedIndex].points.Count() == 0)
                     DeleteCurve(listBox1.SelectedIndex);
-                pictureBox1.Image = drawerForCurves.Draw();
+                pictureBox1.Image = drawerForCurves.DrawLines();
             }
         }
 
         private void resetDrawer()
         {
-            for(int i = 0; i < drawer.curves.Count; i++)
-            {
-                drawer.curves[i].curve_color = Color.Red;
-            }
+            if (lastSelectedRectangleIndex >= 0)
+                foreach (var line in drawerForRectangle[lastSelectedRectangleIndex].curves)
+                    line.curve_color = Color.Red;
+
+            foreach (var index in intersectingLinesIndexes)
+                drawerForCurves.curves[index].curve_color = Color.Blue;
+            intersectingLinesIndexes.Clear();
+
+            lastSelectedRectangleIndex = listBox2.SelectedIndex;
+            //for(int i = 0; i < drawer.curves.Count; i++)
+            //{
+            //    drawer.curves[i].curve_color = Color.Red;
+            //}
             reset = false;
         }
 
@@ -206,12 +232,12 @@ namespace CompGraphLab1
             long rectangleFirxt_y = 827 - rndm.Next(402) * 2;
             long rectangleSecond_x=0;
             long rectangleSecond_y=0;
-            while (rectangleSecond_x <= 0)
+            while (rectangleSecond_x < 9 || rectangleSecond_x >= 854 ||  Math.Abs(rectangleSecond_x  - rectangleFirxt_x) < 10)
             {
                 rndm = new Random();
                 rectangleSecond_x = rectangleFirxt_x - rndm.Next(402);
             }
-            while (rectangleSecond_y <= 0)
+            while (rectangleSecond_y <= 0 || rectangleSecond_y > 827 || Math.Abs(rectangleSecond_y - rectangleFirxt_y) < 10)
             {
                 rndm = new Random();
                 rectangleSecond_y = rectangleFirxt_y - rndm.Next(402);
@@ -255,6 +281,9 @@ namespace CompGraphLab1
 
         private void button3_Click_1(object sender, EventArgs e)
         {
+            foreach (var line in drawerForCurves.curves)
+                line.curve_color = Color.Blue;
+
             if (listBox2.SelectedIndex >= 0)
             {
                 for(int i = 0; i < drawerForCurves.curves.Count; i++)   
@@ -270,6 +299,7 @@ namespace CompGraphLab1
                            drawerForRectangle[listBox2.SelectedIndex].curves[2].points[0].y > drawerForCurves.curves[i].points[1].y))
                     {
                         drawerForCurves.curves[i].curve_color = Color.Green;
+                        intersectingLinesIndexes.Add(i);
                     }
                     else
                     {
@@ -282,6 +312,7 @@ namespace CompGraphLab1
                             )))
                         {
                             drawerForCurves.curves[i].curve_color = Color.LightSteelBlue;
+                            intersectingLinesIndexes.Add(i);
                         }
                         if ((drawerForRectangle[listBox2.SelectedIndex].curves[2].points[1].x < drawerForCurves.curves[i].points[0].x &&
                                drawerForRectangle[listBox2.SelectedIndex].curves[2].points[1].x < drawerForCurves.curves[i].points[1].x ||
@@ -293,6 +324,7 @@ namespace CompGraphLab1
                                drawerForRectangle[listBox2.SelectedIndex].curves[2].points[0].y < drawerForCurves.curves[i].points[1].y))
                         {
                             drawerForCurves.curves[i].curve_color = Color.LightSteelBlue;
+                            intersectingLinesIndexes.Add(i);
                         }
                         if(drawerForCurves.curves[i].curve_color == Color.Red)
                         {
