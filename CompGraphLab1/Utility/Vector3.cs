@@ -23,9 +23,20 @@ namespace CompGraphLab1
 			z = color.B;
 		}
 
+		int ClampColor(int value)
+		{
+			if (value < 0)
+				return 0;
+			if (value > 255)
+				return 255;
+			return value;
+		}
+
 		public Color ToColor()
 		{
-			return Color.FromArgb((int)MathF.Round(x), (int)MathF.Round(y), (int)MathF.Round(z));
+			return Color.FromArgb(ClampColor((int)MathF.Round(x)),
+				ClampColor((int)MathF.Round(y)),
+				ClampColor((int)MathF.Round(z)));
 		}
 
 		/// <summary>

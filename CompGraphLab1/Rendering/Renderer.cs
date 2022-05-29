@@ -16,7 +16,7 @@ namespace CompGraphLab1.Rendering
 		IMeshProjector meshProjector = new MeshProjector();
 		IRasterizer rasterizer = new AltRasterizer();
 		public float[,] RenderZBufferFillPoly(Vector2Int screenSize, IEnumerable<MeshTransform> sceneMeshes, 
-			DirectionalLight light, Camera camera, Color[,] render)
+			PointLight light, Camera camera, Color[,] render)
 		{
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
@@ -60,7 +60,7 @@ namespace CompGraphLab1.Rendering
 			return zbuffer;
 		}
 
-		void ProcessTriangle(RasterTriangleData rastTri, Vector2Int screenSize, float[,] zbuffer, DirectionalLight light,
+		void ProcessTriangle(RasterTriangleData rastTri, Vector2Int screenSize, float[,] zbuffer, PointLight light,
 			MeshTransform mesh, Triangle3D tri, Color[,] render)
 		{
 			var color = mesh.triangleShader(mesh, tri, light);

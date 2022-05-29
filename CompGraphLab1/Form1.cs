@@ -23,6 +23,7 @@ namespace CompGraphLab1
 		IObjLoader loader = new ObjLoader();
 		List<MeshTransform> meshes = new List<MeshTransform>();
 		MeshTransform[] axises;
+		MeshTransform lightObj;
 		//MeshTransform mesh, mesh1, mesh2;
 		public Form1()
 		{
@@ -37,7 +38,7 @@ namespace CompGraphLab1
 				verticalAngle = 60,
 				renderPlaneDistance = .1f
 			};
-			axises = new MeshTransform[3]
+			axises = new MeshTransform[]
 				{
 					//x
 					new MeshTransform()
@@ -46,8 +47,7 @@ namespace CompGraphLab1
 						localScale = Vector3.One,
 						localRotation = Vector3.Forward * 90,
 						triangleShader = Shaders.UnlitColor,
-						//objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
-						objData = new Data.ObjData(),
+						objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
 						baseColor = new Vector3(1, 0, 0)
 					},
 					//y
@@ -57,8 +57,7 @@ namespace CompGraphLab1
 						localScale = Vector3.One,
 						localRotation = Vector3.Right*180,
 						triangleShader = Shaders.UnlitColor,
-						//objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
-						objData = new Data.ObjData(),
+						objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
 						baseColor = new Vector3(0, 1, 0)
 					},
 					//z
@@ -68,10 +67,18 @@ namespace CompGraphLab1
 						localScale = Vector3.One,
 						localRotation = Vector3.Right*270,
 						triangleShader = Shaders.UnlitColor,
-						//objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
-						objData = new Data.ObjData(),
+						objData = loader.LoadFile(@"..\..\..\Sources\axis.obj"),
 						baseColor = new Vector3(0, 0, 1)
-					}
+					},
+					new MeshTransform()
+					{
+						localPosition = light.localPosition,
+						localScale = Vector3.One/10,
+						localRotation = Vector3.Right*180,
+						triangleShader = Shaders.UnlitColor,
+						objData = loader.LoadFile(@"..\..\..\Sources\Sphere.obj"),
+						baseColor = new Vector3(1, 1, 0)
+					} 
 				};
 			CreateImage();
 		}
@@ -113,7 +120,12 @@ namespace CompGraphLab1
 			}
 		}
 
-		DirectionalLight light = new DirectionalLight() { localRotation = new Vector3(-60, 180, 0) };
+		PointLight light = new PointLight() {
+			localRotation = new Vector3(-60, 180, 0),
+			localPosition = Vector3.Forward * 4 + Vector3.Up * 2,//Vector3.Zero,//new Vector3(0, 3, 1),
+			radius = 4f,
+			intensity = 1f
+		};
 
 		private void toolStripButton1_Click(object sender, EventArgs e)
 		{
